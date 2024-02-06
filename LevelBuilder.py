@@ -1,0 +1,2 @@
+class LevelBuilder (object):
+    pass
