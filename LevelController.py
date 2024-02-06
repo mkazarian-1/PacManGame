@@ -1,2 +1,0 @@
-class LevelController (object):
-    pass
