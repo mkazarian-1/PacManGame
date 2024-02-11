@@ -1,3 +1,4 @@
+import math
 from abc import ABC, abstractmethod
 import pygame
 
@@ -9,20 +10,89 @@ class IDrawAble(ABC):
 
 
 class Food(IDrawAble):
+
+    def __init__(self, screen, x, y, cell_width, cell_height, color):
+        self.screen = screen
+        self.x = x
+        self.y = y
+        self.cell_width = cell_width
+        self.cell_height = cell_height
+        self.color = color
+
     def draw(self):
-        pass
+        pygame.draw.circle(self.screen, self.color,
+                           (self.x * self.cell_width + (self.cell_width / 2),
+                            self.y * self.cell_height + (self.cell_height / 2)), 4)
 
 
 class Energiser(IDrawAble):
+    def __init__(self, screen, x, y, cell_width, cell_height, color):
+        self.screen = screen
+        self.x = x
+        self.y = y
+        self.cell_width = cell_width
+        self.cell_height = cell_height
+        self.color = color
+
     def draw(self):
-        pass
+        pygame.draw.circle(self.screen, self.color,
+                           (self.x * self.cell_width + (self.cell_width / 2),
+                            self.y * self.cell_height + (self.cell_height / 2)), 8)
 
 
 class Wall(IDrawAble):
+    def __init__(self, screen, x, y, cell_width, cell_height, position, color):
+        self.screen = screen
+        self.x = x
+        self.y = y
+        self.cell_width = cell_width
+        self.cell_height = cell_height
+        self.position = position
+        self.color = color
+
     def draw(self):
-        pass
+        if self.position == 1:
+            pygame.draw.line(self.screen, self.color,
+                             (self.x * self.cell_width + (self.cell_width / 2), self.y * self.cell_height),
+                             (self.x * self.cell_width + (self.cell_width / 2), (self.y + 1) * self.cell_height), 3)
+
+        else:
+            pygame.draw.line(self.screen, self.color,
+                             (self.x * self.cell_width, self.y * self.cell_height + (self.cell_height / 2)),
+                             ((self.x + 1) * self.cell_width, self.y * self.cell_height + (self.cell_height / 2)), 3)
 
 
 class CurvedWall(IDrawAble):
+
+    def __init__(self, screen, x, y, cell_width, cell_height, position, color):
+        self.screen = screen
+        self.x = x
+        self.y = y
+        self.cell_width = cell_width
+        self.cell_height = cell_height
+        self.position = position
+        self.color = color
+
+    def draw(self):
+        retreat = 2
+        if self.position == 1:
+            pygame.draw.arc(self.screen, self.color, [(self.x * self.cell_width - (self.cell_width / 2)),
+                                                      (self.y * self.cell_height + (self.cell_height / 2)),
+                                                      self.cell_width+retreat, self.cell_height-retreat],0, math.pi/2, 3)
+        elif self.position == 2:
+            pygame.draw.arc(self.screen, self.color, [(self.x * self.cell_width + (self.cell_width / 2)),
+                                                      (self.y * self.cell_height + (self.cell_height / 2)),
+                                                      self.cell_width - retreat, self.cell_height - retreat], math.pi / 2, math.pi, 3)
+        elif self.position == 3:
+            pygame.draw.arc(self.screen, self.color, [(self.x * self.cell_width + (self.cell_width / 2)),
+                                                      (self.y * self.cell_height - (self.cell_height / 2)),
+                                                      self.cell_width - retreat, self.cell_height + retreat],-1 * math.pi, math.pi * -1 / 2, 3)
+        else:
+            pygame.draw.arc(self.screen, self.color, [(self.x * self.cell_width - (self.cell_width / 2)),
+                                                      (self.y * self.cell_height - (self.cell_height / 2)),
+                                                      self.cell_width + retreat, self.cell_height+ retreat] , math.pi * -1 / 2, 0, 3)
+
+
+class BlankSpace(IDrawAble):
     def draw(self):
         pass
