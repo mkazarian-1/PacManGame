@@ -6,13 +6,15 @@ import LevelEnvironment
 class LevelBuilder:
     level_color = "blue"
 
-    def __init__(self, screen, width, height, level_map):
+    def __init__(self, screen, width, height, level_map, level_loop_counter):
         self.screen = screen
         self.width = width
         self.height = height
         self.level_map = level_map
+        self.level_loop_counter = level_loop_counter
 
     def build(self):
+
         cell_height = (self.height - 50) / len(self.level_map)
         cell_width = self.width / len(self.level_map[0])
 
@@ -25,7 +27,8 @@ class LevelBuilder:
                                                .Food(self.screen, x, y, cell_width, cell_height, "white"))
                 elif self.level_map[y][x] == 2:
                     level_environment[y][x] = (LevelEnvironment
-                                               .Energiser(self.screen, x, y, cell_width, cell_height, "white"))
+                                               .Energiser(self.screen, x, y, cell_width, cell_height,
+                                                          self.level_loop_counter, "white"))
                 elif self.level_map[y][x] == 3:
                     level_environment[y][x] = (LevelEnvironment
                                                .Wall(self.screen, x, y, cell_width, cell_height, 1, self.level_color))
@@ -63,3 +66,5 @@ class LevelController:
     def get_cell(self,x,y):
         return self.level_environment[y][x]
 
+    def delete_cell(self, x, y):
+        self.level_environment[y][x] = LevelEnvironment.BlankSpace()

@@ -3,6 +3,7 @@ from win32api import GetSystemMetrics
 
 import LevelMap
 from LevelBuilder import LevelBuilder
+from LevelLoopCounter import LevelLoopCounter
 
 
 class PacManGame:
@@ -12,18 +13,20 @@ class PacManGame:
 
     def start_game(self):
         pygame.init()
-        screen = pygame.display.set_mode([self.WIDTH, self.HEIGHT])
+
         timer = pygame.time.Clock()
+        level_loop_counter = LevelLoopCounter()
+
+        screen = pygame.display.set_mode([self.WIDTH, self.HEIGHT])
+        level_controller = LevelBuilder(screen, self.WIDTH, self.HEIGHT, LevelMap.boards, level_loop_counter).build()
 
         running = True
-
-        level_controller = LevelBuilder(screen, self.WIDTH, self.HEIGHT, LevelMap.boards).build()
 
         while running:
             timer.tick(self.FPS)
             screen.fill("black")
-
             level_controller.update()
+            level_loop_counter.increase()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -32,3 +35,4 @@ class PacManGame:
             pygame.display.flip()
 
         pygame.quit()
+
