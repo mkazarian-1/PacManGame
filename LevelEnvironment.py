@@ -26,16 +26,18 @@ class Food(IDrawAble):
 
 
 class Energiser(IDrawAble):
-    def __init__(self, screen, x, y, cell_width, cell_height, color):
+    def __init__(self, screen, x, y, cell_width, cell_height, level_loop_counter, color):
         self.screen = screen
         self.x = x
         self.y = y
         self.cell_width = cell_width
         self.cell_height = cell_height
+        self.level_loop_counter = level_loop_counter
         self.color = color
 
     def draw(self):
-        pygame.draw.circle(self.screen, self.color,
+        if self.level_loop_counter.get() > 10:
+            pygame.draw.circle(self.screen, self.color,
                            (self.x * self.cell_width + (self.cell_width / 2),
                             self.y * self.cell_height + (self.cell_height / 2)), 8)
 
