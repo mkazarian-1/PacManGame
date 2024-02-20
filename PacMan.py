@@ -1,75 +1,241 @@
 import pygame
+import LevelBuilder
+import LevelEnvironment
+import LevelLoopCounter
+from enum import Enum, auto
 
 
 class PacMan:
-    def __init__(self, screen_width, screen_height, level):
+    PACMAN_SPEED = 2.5
+    WALL_CELL_TYPES = [LevelEnvironment.Wall, LevelEnvironment.CurvedWall]
+
+    def __init__(self, screen, screen_width, screen_height,
+                 level_controller: LevelBuilder.LevelController,
+                 level_loop_counter: LevelLoopCounter.LevelLoopCounter):
+
+        self.screen = screen
         self.screen_width = screen_width
         self.screen_height = screen_height
-        # розмір пакмана робиться відповідно до розміра вікна, треба перевірити, чи на всіх екранах все співпадає
+        self.level_controller = level_controller
+        self.level_loop_counter = level_loop_counter
+
+        self.cell_len_x, self.cell_len_y = level_controller.get_amount_of_cells()
+
+        self.cell_width = level_controller.get_width_of_cells()
+        self.cell_height = level_controller.get_height_of_cells()
+
         self.pacman_width = int(screen_height * 0.05)
         self.pacman_height = int(screen_height * 0.05)
-        self.pacman_halfWidth = self.pacman_width // 2
-        self.pacman_halfHeight = self.pacman_height // 2
-        self.level = level
-        self.pacman_speed = 2
 
-        self.pacman_images = []
-        for i in range(1, 5):
-            image = pygame.image.load(f'characters/pacman_images/{i}.png')
-            scaled_image = pygame.transform.scale(image, (self.pacman_width, self.pacman_height))
-            self.pacman_images.append(scaled_image)
+        self.pacman_cell_x = 15
+        self.pacman_cell_y = 18
 
-        self.player_x = screen_width // 2
-        self.player_y = screen_height // 2
-        self.direction = 0
-        self.center_x = self.player_x + self.pacman_halfWidth
-        self.center_y = self.player_y + self.pacman_halfHeight
+        self.pacman_center_x = self.pacman_cell_x * self.cell_width + self.cell_width / 2
+        self.pacman_center_y = self.pacman_cell_y * self.cell_height + self.cell_height / 2
 
-    def draw_player(self, screen, counter):
-        # 0-RIGHT, 1-LEFT, 2-UP, 3-DOWN
-        image_index = counter // 6
+        self.direction = Position.UP
+        self.turn = Position.NOT_DEFINED
+        self.rotation_allow = True
+
+        # 0-Right 1-Left 2-Up 3-Down
+        self.turn_allow = [True, True, False, False]
+
+        self.pacman_images = self.__set_pacman_image(self.pacman_width, self.pacman_height)
+
+    def update_position(self):
+        self.__pacman_move()
+        self.__draw_player()
+
+    def set_turn_right(self):
+        self.turn = Position.RIGHT
+
+    def set_turn_left(self):
+        self.turn = Position.LEFT
+
+    def set_turn_up(self):
+        self.turn = Position.UP
+
+    def set_turn_down(self):
+        self.turn = Position.DOWN
+
+    def __draw_player(self):
+        pacman_x = self.pacman_center_x - self.pacman_width / 2
+        pacman_y = self.pacman_center_y - self.pacman_height / 2
+
+        image_index = self.level_loop_counter.get() // 6
         if 0 <= image_index < len(self.pacman_images):
-            if self.direction == 0:
-                screen.blit(self.pacman_images[image_index], (self.player_x, self.player_y))
-            elif self.direction == 1:
-                screen.blit(pygame.transform.flip(self.pacman_images[image_index], True, False),
-                            (self.player_x, self.player_y))
-            elif self.direction == 2:
-                screen.blit(pygame.transform.rotate(self.pacman_images[image_index], 90),
-                            (self.player_x, self.player_y))
-            elif self.direction == 3:
-                screen.blit(pygame.transform.rotate(self.pacman_images[image_index], 270),
-                            (self.player_x, self.player_y))
+            if self.direction == Position.RIGHT:
+                self.screen.blit(pygame.transform.rotate(self.pacman_images[image_index], 0),
+                                 (pacman_x, pacman_y))
+            elif self.direction == Position.LEFT:
+                self.screen.blit(pygame.transform.rotate(self.pacman_images[image_index], 180),
+                                 (pacman_x, pacman_y))
+            elif self.direction == Position.UP:
+                self.screen.blit(pygame.transform.rotate(self.pacman_images[image_index], 90),
+                                 (pacman_x, pacman_y))
+            elif self.direction == Position.DOWN:
+                self.screen.blit(pygame.transform.rotate(self.pacman_images[image_index], 270),
+                                 (pacman_x, pacman_y))
         else:
             pass
 
-    def can_move(self, direction):
-        next_x, next_y = self.player_x, self.player_y
-        if direction == 0:  # RIGHT
-            next_x += self.pacman_speed
-        elif direction == 1:  # LEFT
-            next_x -= self.pacman_speed
-        elif direction == 2:  # UP
-            next_y -= self.pacman_speed
-        elif direction == 3:  # DOWN
-            next_y += self.pacman_speed
+    def __pacman_move(self):
+        self.__pacman_rotation()
+        self.__out_of_bound_controller()
 
-        # Check if next position is within bounds and not a wall
-        if (0 <= next_x < self.screen_width - self.pacman_width and
-                0 <= next_y < self.screen_height - self.pacman_height and
-                self.level[int(next_y // self.pacman_height)][int(next_x // self.pacman_width)] < 3):
-            return True
+        if self.direction == Position.RIGHT and self.turn_allow[0]:  # RIGHT
+            if (self.pacman_center_x + self.PACMAN_SPEED
+                    >= self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x + 1, 0.5)):
+
+                self.pacman_cell_x = self.pacman_cell_x + 1
+                self.turn_allow = self.__turn_allow_update(self.pacman_cell_x, self.pacman_cell_y)
+
+                if not self.turn_allow[0]:
+                    self.pacman_center_x = self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x, 0.5)
+                self.rotation_allow = True
+
+            else:
+                self.pacman_center_x = self.pacman_center_x + self.PACMAN_SPEED
+                self.rotation_allow = False
+
+        elif self.direction == Position.LEFT and self.turn_allow[1]:  # LEFT
+            if (self.pacman_center_x - self.PACMAN_SPEED
+                    <= self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x - 1, 0.5)):
+
+                self.pacman_cell_x = self.pacman_cell_x - 1
+                self.turn_allow = self.__turn_allow_update(self.pacman_cell_x, self.pacman_cell_y)
+
+                if not self.turn_allow[1]:
+                    self.pacman_center_x = self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x, 0.5)
+
+                self.rotation_allow = True
+
+            else:
+                self.pacman_center_x = self.pacman_center_x - self.PACMAN_SPEED
+                self.rotation_allow = False
+
+        elif self.direction == Position.UP and self.turn_allow[2]:  # UP
+            if (self.pacman_center_y - self.PACMAN_SPEED
+                    <= self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y - 1, 0.5)):
+
+                self.pacman_cell_y = self.pacman_cell_y - 1
+                self.turn_allow = self.__turn_allow_update(self.pacman_cell_x, self.pacman_cell_y)
+
+                if not self.turn_allow[2]:
+                    self.pacman_center_y = self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y, 0.5)
+
+                self.rotation_allow = True
+
+            else:
+                self.pacman_center_y = self.pacman_center_y - self.PACMAN_SPEED
+                self.rotation_allow = False
+
+        elif self.direction == Position.DOWN and self.turn_allow[3]:  # DOWN
+            if (self.pacman_center_y + self.PACMAN_SPEED
+                    >= self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y + 1, 0.5)):
+
+                self.pacman_cell_y = self.pacman_cell_y + 1
+                self.turn_allow = self.__turn_allow_update(self.pacman_cell_x, self.pacman_cell_y)
+
+                if not self.turn_allow[3]:
+                    self.pacman_center_y = self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y, 0.5)
+
+                self.rotation_allow = True
+
+            else:
+                self.pacman_center_y = self.pacman_center_y + self.PACMAN_SPEED
+                self.rotation_allow = False
+
+    def __pacman_rotation(self):
+
+        if self.turn == Position.RIGHT and self.turn_allow[0]:
+            if self.direction == Position.LEFT:
+                self.direction = Position.RIGHT
+                self.turn = Position.NOT_DEFINED
+            elif self.rotation_allow:
+                self.direction = Position.RIGHT
+                self.turn = Position.NOT_DEFINED
+                self.pacman_center_x = self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x, 0.5)
+
+        elif self.turn == Position.LEFT and self.turn_allow[1]:
+            if self.direction == Position.RIGHT:
+                self.direction = Position.LEFT
+                self.turn = Position.NOT_DEFINED
+            elif self.rotation_allow:
+                self.direction = Position.LEFT
+                self.turn = Position.NOT_DEFINED
+                self.pacman_center_x = self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x, 0.5)
+
+        elif self.turn == Position.UP and self.turn_allow[2]:
+            if self.direction == Position.DOWN:
+                self.direction = Position.UP
+                self.turn = Position.NOT_DEFINED
+            elif self.rotation_allow:
+                self.direction = Position.UP
+                self.turn = Position.NOT_DEFINED
+                self.pacman_center_y = self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y, 0.5)
+
+        elif self.turn == Position.DOWN and self.turn_allow[3]:
+            if self.direction == Position.UP:
+                self.direction = Position.DOWN
+                self.turn = Position.NOT_DEFINED
+            elif self.rotation_allow:
+                self.direction = Position.DOWN
+                self.turn = Position.NOT_DEFINED
+                self.pacman_center_y = self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y, 0.5)
+
+    def __out_of_bound_controller(self):
+        if self.direction == Position.RIGHT and self.pacman_cell_x + 1 == (self.cell_len_x - 1):
+            self.pacman_cell_x = 0
+            self.pacman_center_x = 0
+
+        elif self.direction == Position.LEFT and self.pacman_cell_x == 0:
+            self.pacman_cell_x = self.cell_len_x - 2
+            self.pacman_center_x = self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x, 1)
+
+        elif self.direction == Position.UP and self.pacman_cell_y + 1 == (self.cell_len_y - 1):
+            self.pacman_cell_y = 0
+            self.pacman_center_y = 0
+
+        elif self.direction == Position.DOWN and self.pacman_cell_y == 0:
+            self.pacman_cell_y = self.cell_len_y - 2
+            self.pacman_center_y = self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y, 1)
+
+    def __turn_allow_update(self, cell_x, cell_y):
+        cell_right = self.level_controller.get_cell(cell_x + 1, cell_y)
+        cell_left = self.level_controller.get_cell(cell_x - 1, cell_y)
+        cell_up = self.level_controller.get_cell(cell_x, cell_y - 1)
+        cell_down = self.level_controller.get_cell(cell_x, cell_y + 1)
+
+        return [not self.__is_cell_wall(cell_right),
+                not self.__is_cell_wall(cell_left),
+                not self.__is_cell_wall(cell_up),
+                not self.__is_cell_wall(cell_down)]
+
+    def __is_cell_wall(self, cell):
+        for obj in self.WALL_CELL_TYPES:
+            if type(cell) is obj:
+                return True
         return False
 
-    def update_position(self):
-        if self.direction == 0:  # RIGHT
-            self.player_x += self.pacman_speed
-        elif self.direction == 1:  # LEFT
-            self.player_x -= self.pacman_speed
-        elif self.direction == 2:  # UP
-            self.player_y -= self.pacman_speed
-        elif self.direction == 3:  # DOWN
-            self.player_y += self.pacman_speed
+    @staticmethod
+    def __set_pacman_image(width, height):
+        images = []
+        for i in range(1, 5):
+            image = pygame.image.load(f'characters/pacman_images/{i}.png')
+            scaled_image = pygame.transform.scale(image, (width, height))
+            images.append(scaled_image)
 
-        self.center_x = self.player_x + self.pacman_halfWidth
-        self.center_y = self.player_y + self.pacman_halfHeight
+        return images
+
+    @staticmethod
+    def __get_coordinate_by_cell(cell_size, cell_coordinate, offset):
+        return cell_size * (cell_coordinate + offset)
+
+
+class Position(Enum):
+    RIGHT = auto()
+    LEFT = auto()
+    UP = auto()
+    DOWN = auto()
+    NOT_DEFINED = auto()
