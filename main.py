@@ -1,6 +1,6 @@
 import pygame
 from PacManGame import PacManGame
+from Menu import Menu
 
-pacman = PacManGame()
-pacman.start_game()
-
+menu = Menu()
+menu.start()
