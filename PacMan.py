@@ -44,6 +44,7 @@ class PacMan:
 
     def update_position(self):
         self.__pacman_move()
+        self.__pacman_action()
         self.__draw_player()
 
     def set_turn_right(self):
@@ -184,6 +185,13 @@ class PacMan:
                 self.turn = Position.NOT_DEFINED
                 self.pacman_center_y = self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y, 0.5)
 
+    def __pacman_action(self):
+        level_element = self.level_controller.get_cell(self.pacman_cell_x, self.pacman_cell_y)
+
+        if self.__is_cell_action(level_element):
+            level_element.action()
+            self.level_controller.delete_cell(self.pacman_cell_x, self.pacman_cell_y)
+
     def __out_of_bound_controller(self):
         if self.direction == Position.RIGHT and self.pacman_cell_x + 1 == (self.cell_len_x - 1):
             self.pacman_cell_x = 0
@@ -217,6 +225,9 @@ class PacMan:
             if type(cell) is obj:
                 return True
         return False
+
+    def __is_cell_action(self, cell):
+        return issubclass(type(cell), LevelEnvironment.IActionable)
 
     @staticmethod
     def __set_pacman_image(width, height):
