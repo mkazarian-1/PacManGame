@@ -1,9 +1,10 @@
 import pygame
-from win32api import GetSystemMetrics
-
+import copy
 import LevelMap
+from win32api import GetSystemMetrics
 from LevelBuilder import LevelBuilder
 from LevelLoopCounter import LevelLoopCounter
+from PacMan import PacMan
 from EnemiesCreator import RedGhost, OrangeGhost
 from LevelMap import boards
 
@@ -36,7 +37,6 @@ class Powerup_Counter:
             self.counter = 0
         else:
             self.counter += 1
-
 
 class PacManGame:
     pygame.init()
@@ -80,14 +80,17 @@ class PacManGame:
 
     def start_game(self):
         pygame.init()
-
         timer = pygame.time.Clock()
         level_loop_counter = LevelLoopCounter()
 
         powerup_counter = Powerup_Counter()
 
         screen = pygame.display.set_mode([self.WIDTH, self.HEIGHT])
-        level_controller = LevelBuilder(screen, self.WIDTH, self.HEIGHT, LevelMap.boards, level_loop_counter).build()
+
+        level_controller = (LevelBuilder(screen, self.WIDTH, self.HEIGHT, LevelMap.boards, level_loop_counter)
+                            .build())
+        pacman = PacMan(screen, self.WIDTH, self.HEIGHT, level_controller, level_loop_counter)
+
         running = True
 
         def packman_move(key_pressed):
@@ -106,9 +109,11 @@ class PacManGame:
         # print(int(self.HEIGHT // 2) - 70)
         while running:
             timer.tick(self.FPS)
+            level_loop_counter.increase()
+
             screen.fill("black")
             level_controller.update()
-            level_loop_counter.increase()
+            pacman.update_position()
 
             score_text = self.font.render(f"Powerup: {powerup_counter.get()}", True, 'white')
             screen.blit(score_text, (20, 750))
@@ -227,9 +232,17 @@ class PacManGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-            key_pressed = pygame.key.get_pressed()
-            packman_move(key_pressed)
+                    
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RIGHT:
+                        pacman.set_turn_right()
+                    elif event.key == pygame.K_LEFT:
+                        pacman.set_turn_left()
+                    elif event.key == pygame.K_UP:
+                        pacman.set_turn_up()
+                    elif event.key == pygame.K_DOWN:
+                        pacman.set_turn_down()
+
             pygame.display.flip()
         pygame.quit()
-
 

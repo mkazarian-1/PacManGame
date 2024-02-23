@@ -1,6 +1,7 @@
 import pygame
 from PacManGame import PacManGame
 
-pacman = PacManGame()
-pacman.start_game()
+if __name__ == "__main__":
+    pacman = PacManGame()
+    pacman.start_game()
 
