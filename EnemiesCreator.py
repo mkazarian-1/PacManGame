@@ -186,8 +186,19 @@ class Ghost:
         return x_pos, y_pos, direction
 
     def general_movement(self, allowed_turns, direction, x_pos, y_pos, target_x, target_y, speed):
+        if x_pos//self.cell_width == target_x//self.cell_width and y_pos//self.cell_height == target_y//self.cell_height:
+            if direction == 0 or direction == 1:
+                if allowed_turns[3]:
+                    direction = 3
+                elif allowed_turns[2]:
+                    direction = 2
+            elif direction == 2 or direction == 3:
+                if allowed_turns[0]:
+                    direction = 0
+                elif allowed_turns[1]:
+                    direction = 1
         if direction == 0:
-            if allowed_turns[0] and target_x > x_pos:
+            if allowed_turns[0] and target_x > x_pos or allowed_turns[0]:
                 direction = 0
                 x_pos += speed
             elif allowed_turns[2] and target_y < y_pos:
@@ -207,7 +218,7 @@ class Ghost:
                 x_pos += speed
                 direction = 0
         elif direction == 1:
-            if allowed_turns[1] and target_x < x_pos:
+            if allowed_turns[1] and target_x < x_pos or allowed_turns[1]:
                 x_pos -= speed
                 direction = 1
             elif allowed_turns[2] and target_y < y_pos:
@@ -227,15 +238,15 @@ class Ghost:
                 x_pos -= speed
                 direction = 1
         elif direction == 2:
-            if allowed_turns[2] and y_pos > target_y:
+            if allowed_turns[2] and y_pos > target_y or allowed_turns[2]:
                 y_pos -= speed
                 direction = 2
-            elif allowed_turns[0] and x_pos < target_x:
-                x_pos += speed
-                direction = 0
             elif allowed_turns[1] and x_pos > target_x:
                 x_pos -= speed
                 direction = 1
+            elif allowed_turns[0] and x_pos < target_x:
+                x_pos += speed
+                direction = 0
             elif not allowed_turns[2]:
                 if allowed_turns[0]:
                     x_pos += speed
@@ -247,13 +258,13 @@ class Ghost:
                 y_pos -= speed
                 direction = 2
         elif direction == 3:
-            if allowed_turns[3] and target_y > y_pos:
+            if allowed_turns[3] and target_y > y_pos or allowed_turns[3]:
                 y_pos += speed
                 direction = 3
-            elif allowed_turns[1] and x_pos > target_x and not allowed_turns[3]:
+            elif allowed_turns[1] and x_pos > target_x:
                 x_pos -= speed
                 direction = 1
-            elif allowed_turns[0] and x_pos < target_x and not allowed_turns[3]:
+            elif allowed_turns[0] and x_pos < target_x:
                 x_pos += speed
                 direction = 0
             elif not allowed_turns[3]:
@@ -319,18 +330,14 @@ class RedGhost(Ghost):
 
 
 class BlueGhost(Ghost):
-    def move(self):
-        pass
-
-
-class OrangeGhost(Ghost):
-
     def __init__(self, screen, pacman):
         from PacManGame import PacManGame
         self.pacman_game = PacManGame()
         self.screen = screen
-        self.x_pos = int(self.pacman_game.WIDTH // 2)
-        self.y_pos = int(self.pacman_game.HEIGHT // 2) - 70
+        self.cell_height = (int(self.pacman_game.HEIGHT - 50)) // len(boards)
+        self.cell_width = int(self.pacman_game.WIDTH) // len(boards[0])
+        self.x_pos = int(self.pacman_game.WIDTH // 2) + self.cell_width*2
+        self.y_pos = int(self.pacman_game.HEIGHT // 2) - self.cell_height*3
         self.direction = 2
         self.speed = 2
         self.dead = False
@@ -342,8 +349,92 @@ class OrangeGhost(Ghost):
         self.ghost_height = int(self.pacman_game.HEIGHT * 0.05)
         self.center_x = self.x_pos + self.ghost_width // 2
         self.center_y = self.y_pos + self.ghost_height // 2
+        self.blinky_rect = self.get_rect()
+        self.target_x, self.target_y = self.run_away()
+        self.img = pygame.transform.scale(pygame.image.load("ghosts/blue.png"),
+                                          (self.ghost_width, self.ghost_height))
+        super().__init__(self.screen, self.pacman, self.dead, self.eaten,
+                         self.powerup, self.in_box, self.ghost_width, self.ghost_height,
+                         self.pacman_game, self.cell_width, self.cell_height)
+        self.is_get_target = False
+
+    def run_away(self):
+        self.target_x = 27 * self.cell_width
+        self.target_y = 30 * self.cell_height
+        return self.target_x, self.target_y
+
+    def exit_from_box(self, center_x, center_y):
+        if (int(self.pacman_game.WIDTH // 2) - self.cell_width * 3 < center_x < int(self.pacman_game.WIDTH // 2)
+                + self.cell_width * 2 and int(self.pacman_game.HEIGHT // 2) - self.cell_height * 5 < center_y \
+                 < int(self.pacman_game.HEIGHT // 2) - self.cell_height * 2):
+            self.direction = 2
+            self.eaten = False
+            self.dead = False
+            self.target_x = int(self.pacman_game.WIDTH // 2)
+            self.target_y = int(self.pacman_game.HEIGHT // 2) - self.cell_height * 7
+        elif not (int(self.pacman_game.WIDTH // 2) - self.cell_width * 3 < center_x < int(self.pacman_game.WIDTH // 2)
+                  + self.cell_width * 2 and int(self.pacman_game.HEIGHT // 2) - self.cell_height * 5 < center_y \
+                  < int(self.pacman_game.HEIGHT // 2) - self.cell_height * 2):
+            self.in_box = False
+            self.target_x, self.target_y = self.run_away()
+        return self.direction, self.eaten, self.dead, self.in_box, self.target_x, self.target_y
+
+    def update(self):
+        self.center_x = self.x_pos + self.ghost_width // 2
+        self.center_y = self.y_pos + self.ghost_height // 2
+        allowed_turns = self.collisions(self.center_x, self.center_y)
+        self.direction, self.eaten, self.dead, self.in_box, self.target_x, self.target_y \
+            = self.exit_from_box(self.center_x, self.center_y)
+        self.x_pos, self.y_pos, self.direction, self.is_get_target, self.target_x, self.target_y \
+            = self.get_target(self.x_pos, self.y_pos, self.target_x, self.target_y, self.direction, self.is_get_target)
+        self.x_pos, self.y_pos, self.direction = self.general_movement(allowed_turns, self.direction,
+                                                                       self.x_pos, self.y_pos, self.target_x,
+                                                                       self.target_y, self.speed)
+        self.draw(self.img, self.x_pos, self.y_pos)
+
+    def get_target(self, x_pos, y_pos, target_x, target_y, direction, is_get_target):
+        print(x_pos, target_x)
+        if not is_get_target:
+            if (x_pos + self.cell_width//5) // self.cell_width == target_x // self.cell_width and (
+                    y_pos + self.cell_height // 3) // self.cell_height == target_y // self.cell_height:
+                is_get_target = True
+                target_x, target_y = self.run_away()
+        if is_get_target:
+            if ((x_pos + self.cell_width // 3) // self.cell_width == 15 and (
+                    y_pos + self.cell_height // 3) // self.cell_height == target_y // self.cell_height):
+                direction = 2
+            target_x = 19 * self.cell_width
+            target_y = 24 * self.cell_height
+            if ((x_pos + self.cell_height // 3) // self.cell_width == target_x // self.cell_width and y_pos //
+                    self.cell_height == target_y // self.cell_height):
+                is_get_target = False
+        return x_pos, y_pos, direction, is_get_target, target_x, target_y
+
+    def move(self):
+        pass
+
+
+class OrangeGhost(Ghost):
+
+    def __init__(self, screen, pacman):
+        from PacManGame import PacManGame
+        self.pacman_game = PacManGame()
+        self.screen = screen
         self.cell_height = (int(self.pacman_game.HEIGHT - 50)) // len(boards)
         self.cell_width = int(self.pacman_game.WIDTH) // len(boards[0])
+        self.x_pos = int(self.pacman_game.WIDTH // 2)
+        self.y_pos = int(self.pacman_game.HEIGHT // 2) - self.cell_height*3
+        self.direction = 2
+        self.speed = 2
+        self.dead = False
+        self.in_box = True
+        self.eaten = False
+        self.powerup = False
+        self.pacman = pacman
+        self.ghost_width = int(self.pacman_game.WIDTH * 0.05)
+        self.ghost_height = int(self.pacman_game.HEIGHT * 0.05)
+        self.center_x = self.x_pos + self.ghost_width // 2
+        self.center_y = self.y_pos + self.ghost_height // 2
         self.blinky_rect = self.get_rect()
         self.target_x, self.target_y = (100, 220)
         self.img = pygame.transform.scale(pygame.image.load("ghosts/orange.png"),
@@ -351,13 +442,11 @@ class OrangeGhost(Ghost):
         super().__init__(self.screen, self.pacman, self.dead, self.eaten,
                          self.powerup, self.in_box, self.ghost_width, self.ghost_height,
                          self.pacman_game, self.cell_width, self.cell_height)
-        self.goal = False
+        self.is_get_target = False
 
     def run_away(self):
-        self.target_x = 0
-        self.target_y = self.pacman_game.HEIGHT
-        # self.target_x = 2 * self.cell_width
-        # self.target_y = 30 * self.cell_height
+        self.target_x = 2 * self.cell_width
+        self.target_y = 30 * self.cell_height
         return self.target_x, self.target_y
 
     def exit_from_box(self, center_x, center_y):
@@ -382,16 +471,91 @@ class OrangeGhost(Ghost):
         allowed_turns = self.collisions(self.center_x, self.center_y)
         self.direction, self.eaten, self.dead, self.in_box, self.target_x, self.target_y\
             = self.exit_from_box(self.center_x, self.center_y)
+        self.x_pos, self.y_pos, self.direction, self.is_get_target, self.target_x, self.target_y \
+            = self.get_target(self.x_pos, self.y_pos, self.target_x, self.target_y, self.direction, self.is_get_target)
         self.x_pos, self.y_pos, self.direction = self.general_movement(allowed_turns, self.direction,
                                                                        self.x_pos, self.y_pos, self.target_x,
                                                                        self.target_y, self.speed)
         self.draw(self.img, self.x_pos, self.y_pos)
 
-    def get_target(self, center_x, center_y, target_x, target_y):
-        pass
+    def get_target(self, x_pos, y_pos, target_x, target_y, direction, is_get_target):
+        if not is_get_target:
+            if x_pos // self.cell_width == target_x // self.cell_width and (
+                    y_pos + self.cell_height // 3) // self.cell_height == target_y // self.cell_height:
+                is_get_target = True
+                target_x, target_y = self.run_away()
+        if is_get_target:
+            if ((x_pos + self.cell_width//3)//self.cell_width == 13 and (y_pos + self.cell_height//3)//self.cell_height
+                    == target_y//self.cell_height):
+                direction = 2
+            target_x = 10 * self.cell_width
+            target_y = 24 * self.cell_height
+            if ((x_pos + self.cell_height//3)//self.cell_width == target_x//self.cell_width and y_pos//self.cell_height
+                    == target_y//self.cell_height):
+                is_get_target = False
+        return x_pos, y_pos, direction, is_get_target, target_x, target_y
 
 
 class PinkGhost(Ghost):
+    def __init__(self, screen, pacman):
+        from PacManGame import PacManGame
+        self.pacman_game = PacManGame()
+        self.screen = screen
+        self.cell_height = (int(self.pacman_game.HEIGHT - 50)) // len(boards)
+        self.cell_width = int(self.pacman_game.WIDTH) // len(boards[0])
+        self.x_pos = int(self.pacman_game.WIDTH // 2) - self.cell_width*2
+        self.y_pos = int(self.pacman_game.HEIGHT // 2) - self.cell_height*3
+        self.direction = 2
+        self.speed = 2
+        self.dead = False
+        self.in_box = True
+        self.eaten = False
+        self.powerup = False
+        self.pacman = pacman
+        self.ghost_width = int(self.pacman_game.WIDTH * 0.05)
+        self.ghost_height = int(self.pacman_game.HEIGHT * 0.05)
+        self.center_x = self.x_pos + self.ghost_width // 2
+        self.center_y = self.y_pos + self.ghost_height // 2
+        self.blinky_rect = self.get_rect()
+        self.target_x, self.target_y = self.run_away()
+        self.img = pygame.transform.scale(pygame.image.load("ghosts/pink.png"),
+                                          (self.ghost_width, self.ghost_height))
+        super().__init__(self.screen, self.pacman, self.dead, self.eaten,
+                         self.powerup, self.in_box, self.ghost_width, self.ghost_height,
+                         self.pacman_game, self.cell_width, self.cell_height)
+        self.is_get_target = False
+
+    def run_away(self):
+        self.target_x = 2*self.cell_width
+        self.target_y = 2*self.cell_height
+        return self.target_x, self.target_y
+
+    def exit_from_box(self, center_x, center_y):
+        if (int(self.pacman_game.WIDTH // 2) - self.cell_width * 3 < center_x < int(self.pacman_game.WIDTH // 2)
+                + self.cell_width * 2 and int(self.pacman_game.HEIGHT // 2) - self.cell_height*5 < center_y \
+                < int(self.pacman_game.HEIGHT // 2) - self.cell_height*2):
+            self.direction = 2
+            self.eaten = False
+            self.dead = False
+            self.target_x = int(self.pacman_game.WIDTH // 2)
+            self.target_y = int(self.pacman_game.HEIGHT // 2) - self.cell_height*7
+        elif not (int(self.pacman_game.WIDTH // 2) - self.cell_width * 3 < center_x < int(self.pacman_game.WIDTH // 2)
+                  + self.cell_width * 2 and int(self.pacman_game.HEIGHT // 2) - self.cell_height*5 < center_y \
+                  < int(self.pacman_game.HEIGHT // 2) - self.cell_height*2):
+            self.in_box = False
+            self.target_x, self.target_y = self.run_away()
+        return self.direction, self.eaten, self.dead, self.in_box, self.target_x, self.target_y
+
+    def update(self):
+        self.center_x = self.x_pos + self.ghost_width // 2
+        self.center_y = self.y_pos + self.ghost_height // 2
+        allowed_turns = self.collisions(self.center_x, self.center_y)
+        self.direction, self.eaten, self.dead, self.in_box, self.target_x, self.target_y \
+            = self.exit_from_box(self.center_x, self.center_y)
+        self.x_pos, self.y_pos, self.direction = self.general_movement(allowed_turns, self.direction,
+                                                self.x_pos, self.y_pos, self.target_x, self.target_y, self.speed)
+        self.draw(self.img, self.x_pos, self.y_pos)
+
     def move(self):
         pass
 
