@@ -1,7 +1,8 @@
 import pygame
 from PacManGame import PacManGame
+from Menu import Menu
 
 if __name__ == "__main__":
-    pacman = PacManGame()
-    pacman.start_game()
+    menu = Menu()
+    menu.start()
 
