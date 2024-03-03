@@ -59,7 +59,7 @@ class LevelBuilder:
                                                            self.level_color))
                 elif self.level_map[y][x] == 9:
                     level_environment[y][x] = (LevelEnvironment
-                                               .Wall(self.screen, x, y, self.cell_width, self.cell_height, 2, "white"))
+                                               .Door(self.screen, x, y, self.cell_width, self.cell_height, 2, "white"))
 
         return LevelController(level_environment, self.cell_width, self.cell_height, self.score)
 

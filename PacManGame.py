@@ -13,6 +13,11 @@ class PacManGame:
     HEIGHT = GetSystemMetrics(1) - 70
     WIDTH = HEIGHT * 0.95
     FPS = 60
+    RED_GHOST_CELL_COORDINATE = [12, 12]
+    PINK_GHOST_CELL_COORDINATE = [12, 15]
+    BLUE_GHOST_CELL_COORDINATE = [17, 15]
+    ORANGE_GHOST_CELL_COORDINATE = [15, 15]
+
 
     def __init__(self, width, height, back, image, ins):
         self.options = Options()
@@ -31,40 +36,54 @@ class PacManGame:
         pygame.init()
 
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-        timer = pygame.time.Clock()
+
+        clock = pygame.time.Clock()
+
         level_loop_counter = LevelLoopCounter()
-        level_controller = LevelBuilder(self.screen, self.WIDTH, self.HEIGHT, LevelMap.boards, level_loop_counter).build()
 
-        pacman = PacMan(self.screen, self.WIDTH, self.HEIGHT, level_controller, level_loop_counter)
+        level_controller = LevelBuilder(self.screen, self.WIDTH, self.HEIGHT, LevelMap.boards,
+                                        level_loop_counter).build()
+        cell_len_x, cell_len_y = level_controller.get_amount_of_cells()
+        pacman = PacMan(self.screen, level_controller, level_loop_counter)
 
-        # clyde = OrangeGhost(self.screen, pacman)
-        # blinky = RedGhost(self.screen, pacman)
-        # pinky = PinkGhost(self.screen, pacman)
-        # inky = BlueGhost(self.screen, pacman)
+        ghosts = [
+            RedGhost(self.screen, level_controller,
+                     self.RED_GHOST_CELL_COORDINATE,
+                     [cell_len_x, 0], pacman),
+            BlueGhost(self.screen, level_controller,
+                      self.BLUE_GHOST_CELL_COORDINATE,
+                      [cell_len_x, cell_len_y]),
+            PinkGhost(self.screen, level_controller,
+                      self.PINK_GHOST_CELL_COORDINATE,
+                      [0, 0]),
+            OrangeGhost(self.screen, level_controller,
+                        self.ORANGE_GHOST_CELL_COORDINATE,
+                        [0, cell_len_y]),
+        ]
 
         running = True
 
         while running:
-            timer.tick(self.FPS)
+          
+            clock.tick(self.FPS)
 
-            self.screen.fill(self.background)  # Оновлення фону
-
+            self.screen.fill(self.background)
+    
             if self.ins:
                 self.screen.blit(self.background_image, (0, 0))
-
+          
             level_loop_counter.increase()
             level_controller.update()
-            
+
             pacman.update_position()
-            # blinky.update()
-            # clyde.update()
-            # pinky.update()
-            # inky.update()
+
+            for ghost in ghosts:
+                ghost.update_position()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-               
+
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RIGHT:
                         pacman.set_turn_right()
@@ -73,10 +92,9 @@ class PacManGame:
                     elif event.key == pygame.K_UP:
                         pacman.set_turn_up()
                     elif event.key == pygame.K_DOWN:
-                        pacman.set_turn_down()     
+                        pacman.set_turn_down()
                     elif event.key == pygame.K_ESCAPE:
                         return
-                      
+
             pygame.display.flip()
         pygame.quit()
-

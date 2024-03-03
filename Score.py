@@ -2,7 +2,7 @@ import pygame
 
 
 class PlayerScore:
-    def __init__(self,  screen):
+    def __init__(self, screen):
         self.__score = 0
         self.__screen = screen
 
@@ -16,7 +16,6 @@ class PlayerScore:
         self.__score = 0
 
     def draw_score(self, width, height):
-        #font = pygame.font.SysFont('', 18)
-        font = pygame.font.SysFont(None,28)
-        score_text = font.render(f'Score: {self.get_score()}', True, (255, 255, 255))
+        font = pygame.font.Font("assets/Emulogic-zrEw.ttf", 24)
+        score_text = font.render(f'Score:{self.get_score()}', True, (255, 255, 255))
         self.__screen.blit(score_text, (width, height))
