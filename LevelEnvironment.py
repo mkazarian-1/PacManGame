@@ -17,6 +17,10 @@ class IActionable(ABC):
         ...
 
 
+class IWallAble(ABC):
+    pass
+
+
 class Food(IDrawAble, IActionable):
 
     def __init__(self, screen, x, y, cell_width, cell_height, color, score: Score.PlayerScore):
@@ -58,7 +62,7 @@ class Energiser(IDrawAble, IActionable):
                                 self.y * self.cell_height + (self.cell_height / 2)), 8)
 
 
-class Wall(IDrawAble):
+class Wall(IDrawAble, IWallAble):
     def __init__(self, screen, x, y, cell_width, cell_height, position, color):
         self.screen = screen
         self.x = x
@@ -80,7 +84,11 @@ class Wall(IDrawAble):
                              ((self.x + 1) * self.cell_width, self.y * self.cell_height + (self.cell_height / 2)), 3)
 
 
-class CurvedWall(IDrawAble):
+class Door(Wall):
+    pass
+
+
+class CurvedWall(IDrawAble,IWallAble):
 
     def __init__(self, screen, x, y, cell_width, cell_height, position, color):
         self.screen = screen
