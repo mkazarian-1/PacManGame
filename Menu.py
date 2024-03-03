@@ -1,36 +1,42 @@
 import pygame
 import sys
 from PacManGame import PacManGame
-from win32api import GetSystemMetrics
-from Button import Button
 from Options import Options
 
+pygame.init()
+
+
 def get_font(size, ind):
-    # Повертає шрифт за розміром і індексом
     return pygame.font.Font("assets/Emulogic-zrEw.ttf", int(size * ind))
+
 
 class Menu:
     def __init__(self):
-        self.options = Options()  # Створює об'єкт опцій
+        self.options = Options()
         self.current_screen_size = self.options.get_current_screen_size()
         self.background = self.options.get_current_background_color()
         self.set_screen_size()
+        self.background_image = self.options.get_background_image()
+        self.image_inserted = self.options.image_inserted
+        self.play_rect = None
+        self.options_rect = None
+        self.quit_rect = None
 
     def set_screen_size(self):
-        # Встановлює розмір екрану залежно від поточних налаштувань
         self.HEIGHT, self.WIDTH = self.options.SCREEN_SIZES[self.current_screen_size]
 
     def update_screen(self):
-        # Оновлює розмір екрану та фоновий колір згідно з поточними налаштуваннями
         self.background = self.options.get_current_background_color()
         self.current_screen_size = self.options.get_current_screen_size()
+        self.background_image = self.options.get_background_image()
+        self.image_inserted = self.options.is_image_inserted()
         self.set_screen_size()
 
     def start(self):
-        pygame.init()
         pygame.display.set_caption("PacMan")
         clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.draw_menu()
 
         running = True
         while running:
@@ -38,8 +44,20 @@ class Menu:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    menu_mouse_pos = pygame.mouse.get_pos()
+                    print("Mouse button down at position:", menu_mouse_pos)
+                    if self.play_rect.collidepoint(menu_mouse_pos):
+                        self.play()
+                    if self.options_rect.collidepoint(menu_mouse_pos):
+                        self.option()
+                        self.update_screen()
+                    if self.quit_rect.collidepoint(menu_mouse_pos):
+                        pygame.quit()
 
             self.screen.fill(self.background)
+            if self.image_inserted:
+                self.screen.blit(self.background_image, (0, 0))
             self.draw_menu()
             pygame.display.flip()
             clock.tick(60)
@@ -47,7 +65,6 @@ class Menu:
         pygame.quit()
 
     def draw_menu(self):
-        # Встановлюємо необхідні індекси відповідно до розміру вікна
         if self.current_screen_size == "Large":
             ind = 1
         elif self.current_screen_size == "Medium":
@@ -55,53 +72,39 @@ class Menu:
         elif self.current_screen_size == "Small":
             ind = 0.5
 
-        # Змінюємо розміри кнопок меню відповідно до розміру вікна
-        play_b = pygame.image.load("assets/Play Rect.png")
-        options_b = pygame.image.load("assets/Options Rect.png")
-        quit_b = pygame.image.load("assets/Quit Rect.png")
-
-        play_b = pygame.transform.scale(play_b, (
-        int(play_b.get_width() * ind), int(play_b.get_height() * ind)))
-        options_b = pygame.transform.scale(options_b, (
-        int(options_b.get_width() * ind), int(options_b.get_height() * ind)))
-        quit_b = pygame.transform.scale(quit_b, (
-        int(quit_b.get_width() * ind), int(quit_b.get_height() * ind)))
-
-        menu_mouse_pos = pygame.mouse.get_pos()
-
-        # текст меню
         menu_text = get_font(65, ind).render("MAIN MENU", True, "#f4cd33")
-        menu_rect = menu_text.get_rect(center=(self.WIDTH // 2, 100 * ind))
+        menu_rect = menu_text.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) - (300 * ind)))
 
-        # кнопки
-        play_button = Button(image=play_b, pos=(self.WIDTH // 2, 250 * ind),
-                             text_input="PLAY", font=get_font(65, ind), base_color="#b6d7a8", hovering_color="White")
-        options_button = Button(image=options_b, pos=(self.WIDTH // 2, 400 * ind),
-                                text_input="OPTIONS", font=get_font(65, ind), base_color="#b6d7a8", hovering_color="White")
-        quit_button = Button(image=quit_b, pos=(self.WIDTH // 2, 550 * ind),
-                             text_input="QUIT", font=get_font(65, ind), base_color="#b6d7a8", hovering_color="White")
+        play_button = get_font(65, ind).render("PLAY", True, (255, 255, 255))
+        self.play_rect = play_button.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) - (150 * ind)))
+        self.screen.blit(play_button, self.play_rect)
 
-        # зміна кольору кнопки, якщо навели курсор
+        if self.play_rect.collidepoint(pygame.mouse.get_pos()):
+            play_button = get_font(65, ind).render("PLAY", True, (255, 242, 204))
+            self.screen.blit(play_button, self.play_rect)
+
+        options_button = get_font(65, ind).render("OPTIONS", True, (255, 255, 255))
+        self.options_rect = options_button.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2))
+        self.screen.blit(options_button, self.options_rect)
+
+        if self.options_rect.collidepoint(pygame.mouse.get_pos()):
+            options_button = get_font(65, ind).render("OPTIONS", True, (255, 242, 204))
+            self.screen.blit(options_button, self.options_rect)
+
+        quit_button = get_font(65, ind).render("QUIT", True, (255, 255, 255))
+        self.quit_rect = quit_button.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) + (150 * ind)))
+        self.screen.blit(quit_button, self.quit_rect)
+
+        if self.quit_rect.collidepoint(pygame.mouse.get_pos()):
+            quit_button = get_font(65, ind).render("QUIT", True, (255, 242, 204))
+            self.screen.blit(quit_button, self.quit_rect)
+
         self.screen.blit(menu_text, menu_rect)
-        for button in [play_button, options_button, quit_button]:
-            button.changeColor(menu_mouse_pos)
-            button.update(self.screen)
-
-        for event in pygame.event.get():
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if play_button.checkForInput(menu_mouse_pos):
-                    self.play()
-                if options_button.checkForInput(menu_mouse_pos):
-                    self.option()
-                    self.update_screen()  # Оновлює розмір екрану при переході до налаштувань
-                if quit_button.checkForInput(menu_mouse_pos):
-                    pygame.quit()
 
     def option(self):
-        # Відображає меню налаштувань
         self.options.start()
 
     def play(self):
-        # Починає гру
-        pacman = PacManGame(self.WIDTH, self.HEIGHT, self.background)
+        pacman = PacManGame(self.WIDTH, self.HEIGHT, self.background, self.background_image,
+                            self.options.image_inserted)
         pacman.start_game()
