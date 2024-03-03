@@ -7,15 +7,14 @@ from enum import Enum, auto
 
 class PacMan:
     PACMAN_SPEED = 2.5
-    WALL_CELL_TYPES = [LevelEnvironment.Wall, LevelEnvironment.CurvedWall]
 
-    def __init__(self, screen, screen_width, screen_height,
+    def __init__(self, screen: pygame.surface.Surface,
                  level_controller: LevelBuilder.LevelController,
                  level_loop_counter: LevelLoopCounter.LevelLoopCounter):
 
         self.screen = screen
-        self.screen_width = screen_width
-        self.screen_height = screen_height
+        self.screen_width = screen.get_width()
+        self.screen_height = screen.get_height()
         self.level_controller = level_controller
         self.level_loop_counter = level_loop_counter
 
@@ -24,8 +23,8 @@ class PacMan:
         self.cell_width = level_controller.get_width_of_cells()
         self.cell_height = level_controller.get_height_of_cells()
 
-        self.pacman_width = int(screen_height * 0.05)
-        self.pacman_height = int(screen_height * 0.05)
+        self.pacman_width = int(self.screen_height * 0.05)
+        self.pacman_height = int(self.screen_height * 0.05)
 
         self.pacman_cell_x = 15
         self.pacman_cell_y = 18
@@ -38,7 +37,7 @@ class PacMan:
         self.rotation_allow = True
 
         # 0-Right 1-Left 2-Up 3-Down
-        self.turn_allow = [True, True, False, False]
+        self.turn_allow = self.__turn_allow_update(self.pacman_cell_x,self.pacman_cell_y)
 
         self.pacman_images = self.__set_pacman_image(self.pacman_width, self.pacman_height)
 
@@ -58,6 +57,9 @@ class PacMan:
 
     def set_turn_down(self):
         self.turn = Position.DOWN
+
+    def get_cell_coordinates(self):
+        return [self.pacman_cell_x, self.pacman_cell_y]
 
     def __draw_player(self):
         pacman_x = self.pacman_center_x - self.pacman_width / 2
@@ -221,10 +223,7 @@ class PacMan:
                 not self.__is_cell_wall(cell_down)]
 
     def __is_cell_wall(self, cell):
-        for obj in self.WALL_CELL_TYPES:
-            if type(cell) is obj:
-                return True
-        return False
+        return issubclass(type(cell), LevelEnvironment.IWallAble)
 
     def __is_cell_action(self, cell):
         return issubclass(type(cell), LevelEnvironment.IActionable)
