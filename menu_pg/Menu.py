@@ -46,7 +46,6 @@ class Menu:
                     sys.exit()
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     menu_mouse_pos = pygame.mouse.get_pos()
-                    print("Mouse button down at position:", menu_mouse_pos)
                     if self.play_rect.collidepoint(menu_mouse_pos):
                         self.play()
                     if self.options_rect.collidepoint(menu_mouse_pos):
