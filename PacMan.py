@@ -1,7 +1,5 @@
 import pygame
-import LevelBuilder
-import LevelEnvironment
-import LevelLoopCounter
+from level import LevelBuilder, LevelEnvironment, LevelLoopCounter
 from enum import Enum, auto
 
 

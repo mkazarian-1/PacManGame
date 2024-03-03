@@ -2,10 +2,7 @@ import copy
 import math
 from abc import ABC, abstractmethod
 from enum import Enum, auto
-import numpy as np
-import LevelBuilder
-import LevelEnvironment
-from LevelMap import boards
+from level import LevelBuilder, LevelEnvironment
 import pygame
 
 from PacMan import PacMan

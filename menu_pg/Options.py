@@ -167,5 +167,5 @@ class Options:
         return self.image_inserted
 
     def insert_image(self):
-        self.background_image = pygame.image.load("assets/cute.png").convert()
+        self.background_image = pygame.image.load("../assets/cute.png").convert()
         self.background_image = pygame.transform.scale(self.background_image, (self.WIDTH, self.HEIGHT))

@@ -1,6 +1,4 @@
-import pygame
-import numpy as np
-import LevelEnvironment
+import level.LevelEnvironment as LevelEnvironment
 import Score
 
 

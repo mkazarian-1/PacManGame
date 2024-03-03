@@ -1,9 +1,9 @@
 import pygame
-import LevelMap
+from level import LevelMap
 from win32api import GetSystemMetrics
-from LevelBuilder import LevelBuilder
-from LevelLoopCounter import LevelLoopCounter
-from Options import Options
+from level.LevelBuilder import LevelBuilder
+from level.LevelLoopCounter import LevelLoopCounter
+from menu_pg.Options import Options
 from PacMan import PacMan
 from EnemiesCreator import RedGhost, OrangeGhost, PinkGhost, BlueGhost
 
