@@ -1,7 +1,7 @@
 import pygame
 import sys
 from PacManGame import PacManGame
-from Options import Options
+from menu_pg.Options import Options
 
 pygame.init()
 
