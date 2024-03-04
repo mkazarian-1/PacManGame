@@ -64,13 +64,13 @@ class PacManGame:
                      [cell_len_x, 0], pacman),
             BlueGhost(level_surface, level_controller, health,
                       self.BLUE_GHOST_CELL_COORDINATE,
-                      [cell_len_x, cell_len_y]),
+                      [cell_len_x, cell_len_y], pacman, blinky),
             PinkGhost(level_surface, level_controller, health,
                       self.PINK_GHOST_CELL_COORDINATE,
-                      [0, 0]),
+                      [0, 0], pacman),
             OrangeGhost(level_surface, level_controller, health,
                         self.ORANGE_GHOST_CELL_COORDINATE,
-                        [0, cell_len_y]),
+                        [0, cell_len_y], pacman),
         ]
 
         running = True
