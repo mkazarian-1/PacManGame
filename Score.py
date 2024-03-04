@@ -15,7 +15,7 @@ class PlayerScore:
     def clera_score(self):
         self.__score = 0
 
-    def draw_score(self, width, height):
+    def draw(self, width, height):
         font = pygame.font.Font("assets/Emulogic-zrEw.ttf", 24)
         score_text = font.render(f'Score:{self.get_score()}', True, (255, 255, 255))
         self.__screen.blit(score_text, (width, height))

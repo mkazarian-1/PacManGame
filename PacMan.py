@@ -40,6 +40,8 @@ class PacMan:
         self.pacman_images = self.__set_pacman_image(self.pacman_width, self.pacman_height)
 
     def update_position(self):
+        self.__pacman_rotation()
+        self.__out_of_bound_controller()
         self.__pacman_move()
         self.__pacman_action()
         self.__draw_player()
@@ -81,9 +83,6 @@ class PacMan:
             pass
 
     def __pacman_move(self):
-        self.__pacman_rotation()
-        self.__out_of_bound_controller()
-
         if self.direction == Position.RIGHT and self.turn_allow[0]:  # RIGHT
             if (self.pacman_center_x + self.PACMAN_SPEED
                     >= self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x + 1, 0.5)):

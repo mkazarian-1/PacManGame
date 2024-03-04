@@ -1,19 +1,22 @@
+import pygame
+
 import level.LevelEnvironment as LevelEnvironment
 import Score
+from Health import Health
 
 
 class LevelBuilder:
     level_color = "blue"
 
-    def __init__(self, screen, width, height, level_map, level_loop_counter):
+    def __init__(self, screen: pygame.surface.Surface, level_map, level_loop_counter, score: Score.PlayerScore):
         self.screen = screen
-        self.width = width
-        self.height = height
+        self.width = screen.get_width()
+        self.height = screen.get_height()
         self.level_map = level_map
         self.level_loop_counter = level_loop_counter
-        self.cell_height = (self.height - 50) / len(self.level_map)
+        self.cell_height = self.height / len(self.level_map)
         self.cell_width = self.width / len(self.level_map[0])
-        self.score = Score.PlayerScore(screen)
+        self.score = score
 
     def build(self):
 
@@ -59,22 +62,19 @@ class LevelBuilder:
                     level_environment[y][x] = (LevelEnvironment
                                                .Door(self.screen, x, y, self.cell_width, self.cell_height, 2, "white"))
 
-        return LevelController(level_environment, self.cell_width, self.cell_height, self.score)
+        return LevelController(level_environment, self.cell_width, self.cell_height)
 
 
 class LevelController:
-    def __init__(self, level_environment, cell_width, cell_height, score: Score.PlayerScore):
+    def __init__(self, level_environment, cell_width, cell_height):
         self.level_environment = level_environment
         self.cell_width = cell_width
         self.cell_height = cell_height
-        self.score = score
 
     def update(self):
         for y in range(len(self.level_environment)):
             for x in range(len(self.level_environment[0])):
                 self.level_environment[y][x].draw()
-
-        self.score.draw_score(10, len(self.level_environment) * self.cell_height)
 
     def get_cell(self, x, y):
         return self.level_environment[y][x]
@@ -90,3 +90,20 @@ class LevelController:
 
     def get_height_of_cells(self):
         return self.cell_height
+
+
+class LevelBar:
+    def __init__(self, screen, score: Score.PlayerScore, health: Health):
+        self.screen = screen
+        self.health = health
+        self.score = score
+
+    def update(self):
+        self.score.draw(self.screen.get_width() * 0.05, 0)
+        self.health.draw(self.screen.get_width() * 0.85, 0)
+
+    def get_score(self):
+        return self.score
+
+    def get_health(self):
+        return self.health
