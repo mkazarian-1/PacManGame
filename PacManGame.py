@@ -18,7 +18,6 @@ class PacManGame:
     BLUE_GHOST_CELL_COORDINATE = [17, 15]
     ORANGE_GHOST_CELL_COORDINATE = [15, 15]
 
-
     def __init__(self, width, height, back, image, ins):
         self.options = Options()
         self.current_screen_size = self.options.get_current_screen_size()
@@ -46,20 +45,16 @@ class PacManGame:
         cell_len_x, cell_len_y = level_controller.get_amount_of_cells()
         pacman = PacMan(self.screen, level_controller, level_loop_counter)
 
-        ghosts = [
-            RedGhost(self.screen, level_controller,
-                     self.RED_GHOST_CELL_COORDINATE,
-                     [cell_len_x, 0], pacman),
-            BlueGhost(self.screen, level_controller,
-                      self.BLUE_GHOST_CELL_COORDINATE,
-                      [cell_len_x, cell_len_y]),
-            PinkGhost(self.screen, level_controller,
-                      self.PINK_GHOST_CELL_COORDINATE,
-                      [0, 0]),
-            OrangeGhost(self.screen, level_controller,
-                        self.ORANGE_GHOST_CELL_COORDINATE,
-                        [0, cell_len_y]),
-        ]
+        blinky = RedGhost(self.screen, level_controller, self.RED_GHOST_CELL_COORDINATE,
+                          [cell_len_x, 0], pacman)
+        inky = BlueGhost(self.screen, level_controller, self.BLUE_GHOST_CELL_COORDINATE,
+                         (pacman.pacman_cell_x, pacman.pacman_cell_y), pacman, blinky)
+        pinky = PinkGhost(self.screen, level_controller, self.PINK_GHOST_CELL_COORDINATE,
+                          (pacman.pacman_cell_x, pacman.pacman_cell_y), pacman)
+        clyde = OrangeGhost(self.screen, level_controller, self.ORANGE_GHOST_CELL_COORDINATE,
+                            (pacman.pacman_cell_x, pacman.pacman_cell_y), pacman)
+
+        ghosts = [blinky, inky, pinky, clyde]
 
         running = True
 
