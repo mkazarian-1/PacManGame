@@ -3,6 +3,8 @@ import math
 import numpy as np
 from abc import ABC, abstractmethod
 from enum import Enum, auto
+
+import Health
 from level import LevelBuilder, LevelEnvironment
 import pygame
 from queue import PriorityQueue
@@ -16,12 +18,13 @@ class Ghost(ABC):
     BOX_GOAL = [13, 15]
 
     def __init__(self, screen: pygame.surface.Surface,
-                 level_controller: LevelBuilder.LevelController,
+                 level_controller: LevelBuilder.LevelController, player_health: Health.Health,
                  ghost_cell_coordinates, ghost_base_goal):
         self.screen = screen
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
         self.level_controller = level_controller
+        self.health = player_health
 
         self.cell_len_x, self.cell_len_y = level_controller.get_amount_of_cells()
 
@@ -55,8 +58,9 @@ class Ghost(ABC):
         self._make_opposite_access = False
 
     def update_position(self):
-
         self._goal_controller()
+        self._rotation()
+        self._out_of_bound_controller()
         self._move()
         self._draw_player()
 
@@ -105,11 +109,7 @@ class Ghost(ABC):
                 self.direction = Position.UP
                 self._make_opposite_access = False
 
-
     def _move(self):
-        self._rotation()
-        self._out_of_bound_controller()
-
         if self.direction == Position.RIGHT and self.turn_allow[0]:  # RIGHT
             if (self.ghost_center_x + self.GHOST_SPEED
                     >= self._get_coordinate_by_cell(self.cell_width, self.ghost_cell_x + 1, 0.5)):
@@ -241,19 +241,6 @@ class Ghost(ABC):
                 not self._is_cell_wall(self.level_controller.get_cell(cell_x, cell_y - 1)),
                 not self._is_cell_wall(self.level_controller.get_cell(cell_x, cell_y + 1))]
 
-    # def draw(self, img, x_pos, y_pos):
-    #     if not self.powerup and not self.dead and not self.eaten \
-    #             or (self.powerup and self.dead and self.eaten and self.in_box):
-    #         self.screen.blit(img, (x_pos, y_pos))
-    #     elif self.powerup and not self.dead and not self.eaten:
-    #         self.screen.blit(self.img_spooked, (x_pos, y_pos))
-    #     elif self.powerup and self.eaten and self.dead:
-    #         self.screen.blit(self.img_dead, (x_pos, y_pos))
-    #
-    # def get_rect(self):
-    #     ghost_rect = pygame.rect.Rect((self.center_x, self.center_y), (self.ghost_width, self.ghost_height))
-    #     return ghost_rect
-
     def _is_cell_wall(self, cell):
         if self.is_in_box and type(cell) is LevelEnvironment.Door:
             return False
@@ -274,6 +261,7 @@ class Ghost(ABC):
     @staticmethod
     def _get_vector_distance_between_cell(cell_first_x, cell_first_y, cell_second_x, cell_second_y):
         return math.sqrt((cell_second_x - cell_first_x) ** 2 + (cell_second_y - cell_first_y) ** 2)
+
     # def pacman_collision(self, dead, eaten, target_x, target_y, powerup, speed, ghost_rect):
     #     if (pygame.Rect.colliderect(ghost_rect, self.pacman_rect) and powerup and not dead
     #             and not eaten):
@@ -289,8 +277,8 @@ class RedGhost(Ghost):
     IMAGE_PASS = 'ghosts/red.png'
 
     def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
-                 ghost_cell_coordinates, ghost_base_goal, pacman: PacMan):
-        super().__init__(screen, level_controller, ghost_cell_coordinates, ghost_base_goal)
+                 player_health: Health.Health, ghost_cell_coordinates, ghost_base_goal, pacman: PacMan):
+        super().__init__(screen, level_controller, player_health, ghost_cell_coordinates, ghost_base_goal)
         self.pacman = pacman
 
     def _get_image(self, width, height):
