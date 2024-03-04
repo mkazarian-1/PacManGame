@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from enum import Enum, auto
 
 import Health
+from Position import Position
 from level import LevelBuilder, LevelEnvironment
 import pygame
 
@@ -16,13 +17,14 @@ class Ghost(ABC):
     BOX_GOAL = [13, 15]
 
     def __init__(self, screen: pygame.surface.Surface,
-                 level_controller: LevelBuilder.LevelController, player_health: Health.Health,
+                 level_controller: LevelBuilder.LevelController, player_health: Health.Health, pacman: PacMan,
                  ghost_cell_coordinates, ghost_base_goal):
         self.screen = screen
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
         self.level_controller = level_controller
         self.health = player_health
+        self.pacman = pacman
 
         self.cell_len_x, self.cell_len_y = level_controller.get_amount_of_cells()
 
@@ -50,7 +52,7 @@ class Ghost(ABC):
         self.turn_allow = self._turn_allow_update(self.ghost_cell_x, self.ghost_cell_y)
 
         self.start_timer = pygame.time.get_ticks()
-        self.mode_durations = [10000, 60000]
+        self.mode_durations = [5000, 60000]
         self.mode_index = 0
 
         self._make_opposite_access = False
@@ -274,11 +276,6 @@ class Ghost(ABC):
 class RedGhost(Ghost):
     IMAGE_PASS = 'ghosts/red.png'
 
-    def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
-                 player_health: Health.Health, ghost_cell_coordinates, ghost_base_goal, pacman: PacMan):
-        super().__init__(screen, level_controller, player_health, ghost_cell_coordinates, ghost_base_goal)
-        self.pacman = pacman
-
     def _get_image(self, width, height):
         image = pygame.image.load(self.IMAGE_PASS)
         scaled_image = pygame.transform.scale(image, (width, height))
@@ -286,30 +283,6 @@ class RedGhost(Ghost):
 
     def _get_angry_goal(self):
         return self.pacman.get_cell_coordinates()
-
-
-class BlueGhost(Ghost):
-    IMAGE_PASS = 'ghosts/blue.png'
-
-    def _get_image(self, width, height):
-        image = pygame.image.load(self.IMAGE_PASS)
-        scaled_image = pygame.transform.scale(image, (width, height))
-        return scaled_image
-
-    def _get_angry_goal(self):
-        return copy.deepcopy(self.GHOST_BASE_GOAL)
-
-
-class OrangeGhost(Ghost):
-    IMAGE_PASS = 'ghosts/orange.png'
-
-    def _get_image(self, width, height):
-        image = pygame.image.load(self.IMAGE_PASS)
-        scaled_image = pygame.transform.scale(image, (width, height))
-        return scaled_image
-
-    def _get_angry_goal(self):
-        return copy.deepcopy(self.GHOST_BASE_GOAL)
 
 
 class PinkGhost(Ghost):
@@ -321,12 +294,76 @@ class PinkGhost(Ghost):
         return scaled_image
 
     def _get_angry_goal(self):
+        direction = self.pacman.get_direction()
+        new_goal = copy.deepcopy(self.pacman.get_cell_coordinates())
+
+        if direction == Position.RIGHT:
+            new_goal[0] += 4
+        elif direction == Position.LEFT:
+            new_goal[0] -= 4
+        elif direction == Position.UP:
+            new_goal[1] -= 4
+        elif direction == Position.DOWN:
+            new_goal[1] += 4
+
+        return new_goal
+
+
+class OrangeGhost(Ghost):
+    IMAGE_PASS = 'ghosts/orange.png'
+
+    def _get_image(self, width, height):
+        image = pygame.image.load(self.IMAGE_PASS)
+        scaled_image = pygame.transform.scale(image, (width, height))
+        return scaled_image
+
+    def _get_angry_goal(self):
+
+        goal = copy.deepcopy(self.pacman.get_cell_coordinates())
+        distant = self._get_vector_distance_between_cell(self.ghost_cell_x,self.ghost_cell_y, goal[0], goal[1])
+        if distant >= 8:
+            return goal
         return copy.deepcopy(self.GHOST_BASE_GOAL)
 
 
-class Position(Enum):
-    RIGHT = auto()
-    LEFT = auto()
-    UP = auto()
-    DOWN = auto()
-    NOT_DEFINED = auto()
+class BlueGhost(Ghost):
+    IMAGE_PASS = 'ghosts/blue.png'
+
+    def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
+                 player_health: Health.Health, pacman: PacMan, ghost_cell_coordinates, ghost_base_goal, ghost: Ghost):
+        super().__init__(screen, level_controller, player_health, pacman, ghost_cell_coordinates, ghost_base_goal)
+        self.ghost = ghost
+
+    def _get_image(self, width, height):
+        image = pygame.image.load(self.IMAGE_PASS)
+        scaled_image = pygame.transform.scale(image, (width, height))
+        return scaled_image
+
+    def _get_angry_goal(self):
+
+        direction = self.pacman.get_direction()
+        pacman_x, pacman_y = self.pacman.get_cell_coordinates()
+        blinky_x, blinky_y = self.ghost.ghost_cell_x, self.ghost.ghost_cell_y
+
+        if direction == Position.RIGHT:
+            target_x = pacman_x + 2
+            target_y = pacman_y
+        elif direction == Position.LEFT:
+            target_x = pacman_x - 2
+            target_y = pacman_y
+        elif direction == Position.DOWN:
+            target_x = pacman_x
+            target_y = pacman_y + 2
+        else:
+            target_x = pacman_x
+            target_y = pacman_y - 2
+
+        vector_x = target_x - blinky_x
+        vector_y = target_y - blinky_y
+
+        target_x = blinky_x + 2 * vector_x
+        target_y = blinky_y + 2 * vector_y
+
+        return [target_x, target_y]
+
+

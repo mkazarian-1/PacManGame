@@ -1,4 +1,6 @@
 import pygame
+
+from Position import Position
 from level import LevelBuilder, LevelEnvironment, LevelLoopCounter
 from enum import Enum, auto
 
@@ -57,6 +59,9 @@ class PacMan:
 
     def set_turn_down(self):
         self.turn = Position.DOWN
+
+    def get_direction(self):
+        return self.direction
 
     def get_cell_coordinates(self):
         return [self.pacman_cell_x, self.pacman_cell_y]
@@ -240,9 +245,4 @@ class PacMan:
         return cell_size * (cell_coordinate + offset)
 
 
-class Position(Enum):
-    RIGHT = auto()
-    LEFT = auto()
-    UP = auto()
-    DOWN = auto()
-    NOT_DEFINED = auto()
+
