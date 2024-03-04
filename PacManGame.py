@@ -48,11 +48,11 @@ class PacManGame:
         blinky = RedGhost(self.screen, level_controller, self.RED_GHOST_CELL_COORDINATE,
                           [cell_len_x, 0], pacman)
         inky = BlueGhost(self.screen, level_controller, self.BLUE_GHOST_CELL_COORDINATE,
-                         (pacman.pacman_cell_x, pacman.pacman_cell_y), pacman, blinky)
+                         (cell_len_x, cell_len_y), pacman, blinky)
         pinky = PinkGhost(self.screen, level_controller, self.PINK_GHOST_CELL_COORDINATE,
-                          (pacman.pacman_cell_x, pacman.pacman_cell_y), pacman)
+                          (0, 0), pacman)
         clyde = OrangeGhost(self.screen, level_controller, self.ORANGE_GHOST_CELL_COORDINATE,
-                            (pacman.pacman_cell_x, pacman.pacman_cell_y), pacman)
+                            (0, cell_len_y), pacman)
 
         ghosts = [blinky, inky, pinky, clyde]
 
