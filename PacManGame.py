@@ -58,20 +58,23 @@ class PacManGame:
         cell_len_x, cell_len_y = level_controller.get_amount_of_cells()
 
         pacman = PacMan(level_surface, level_controller, level_loop_counter)
-        ghosts = [
-            RedGhost(level_surface, level_controller, health,
-                     self.RED_GHOST_CELL_COORDINATE,
-                     [cell_len_x, 0], pacman),
-            BlueGhost(level_surface, level_controller, health,
-                      self.BLUE_GHOST_CELL_COORDINATE,
-                      [cell_len_x, cell_len_y], pacman, blinky),
-            PinkGhost(level_surface, level_controller, health,
-                      self.PINK_GHOST_CELL_COORDINATE,
-                      [0, 0], pacman),
-            OrangeGhost(level_surface, level_controller, health,
-                        self.ORANGE_GHOST_CELL_COORDINATE,
-                        [0, cell_len_y], pacman),
-        ]
+
+        red_ghost = RedGhost(level_surface, level_controller, health, pacman,
+                             self.RED_GHOST_CELL_COORDINATE,
+                             [cell_len_x, 0])
+
+        blue_ghost = BlueGhost(level_surface, level_controller, health, pacman,
+                               self.BLUE_GHOST_CELL_COORDINATE,
+                               [cell_len_x, cell_len_y], red_ghost)
+
+        pink_ghost = PinkGhost(level_surface, level_controller, health, pacman,
+                               self.PINK_GHOST_CELL_COORDINATE,
+                               [0, 0])
+        orange_ghost = OrangeGhost(level_surface, level_controller, health, pacman,
+                                   self.ORANGE_GHOST_CELL_COORDINATE,
+                                   [0, cell_len_y])
+
+        ghosts = [red_ghost, blue_ghost, pink_ghost, orange_ghost]
 
         running = True
 

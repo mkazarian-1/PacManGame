@@ -1,30 +1,30 @@
 import copy
 import math
-import numpy as np
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 
 import Health
+from Position import Position
 from level import LevelBuilder, LevelEnvironment
 import pygame
-from queue import PriorityQueue
-from level.LevelMap import boards
+
 from PacMan import PacMan
 
 
 class Ghost(ABC):
-    GHOST_SPEED = 2
+    GHOST_SPEED = 3
     OUT_OF_BOX_GOAL = [13, 12]
     BOX_GOAL = [13, 15]
 
     def __init__(self, screen: pygame.surface.Surface,
-                 level_controller: LevelBuilder.LevelController, player_health: Health.Health,
+                 level_controller: LevelBuilder.LevelController, player_health: Health.Health, pacman: PacMan,
                  ghost_cell_coordinates, ghost_base_goal):
         self.screen = screen
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
         self.level_controller = level_controller
         self.health = player_health
+        self.pacman = pacman
 
         self.cell_len_x, self.cell_len_y = level_controller.get_amount_of_cells()
 
@@ -52,7 +52,7 @@ class Ghost(ABC):
         self.turn_allow = self._turn_allow_update(self.ghost_cell_x, self.ghost_cell_y)
 
         self.start_timer = pygame.time.get_ticks()
-        self.mode_durations = [10000, 60000]
+        self.mode_durations = [5000, 60000]
         self.mode_index = 0
 
         self._make_opposite_access = False
@@ -276,11 +276,6 @@ class Ghost(ABC):
 class RedGhost(Ghost):
     IMAGE_PASS = 'ghosts/red.png'
 
-    def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
-                 player_health: Health.Health, ghost_cell_coordinates, ghost_base_goal, pacman: PacMan):
-        super().__init__(screen, level_controller, player_health, ghost_cell_coordinates, ghost_base_goal)
-        self.pacman = pacman
-
     def _get_image(self, width, height):
         image = pygame.image.load(self.IMAGE_PASS)
         scaled_image = pygame.transform.scale(image, (width, height))
@@ -290,14 +285,8 @@ class RedGhost(Ghost):
         return self.pacman.get_cell_coordinates()
 
 
-class BlueGhost(Ghost):
-    IMAGE_PASS = 'ghosts/blue.png'
-
-    def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
-                 ghost_cell_coordinates, ghost_base_goal, pacman: PacMan, blinky: RedGhost):
-        super().__init__(screen, level_controller, ghost_cell_coordinates, ghost_base_goal)
-        self.pacman = pacman
-        self.blinky = blinky
+class PinkGhost(Ghost):
+    IMAGE_PASS = 'ghosts/pink.png'
 
     def _get_image(self, width, height):
         image = pygame.image.load(self.IMAGE_PASS)
@@ -305,190 +294,76 @@ class BlueGhost(Ghost):
         return scaled_image
 
     def _get_angry_goal(self):
+        direction = self.pacman.get_direction()
+        new_goal = copy.deepcopy(self.pacman.get_cell_coordinates())
 
-        target_x_before_blinky = 0
-        target_y_before_blinky = 0
+        if direction == Position.RIGHT:
+            new_goal[0] += 4
+        elif direction == Position.LEFT:
+            new_goal[0] -= 4
+        elif direction == Position.UP:
+            new_goal[1] -= 4
+        elif direction == Position.DOWN:
+            new_goal[1] += 4
 
-        if (self.pacman.direction == 2 or self.pacman.direction == 1) and self.pacman.pacman_cell_x > 2:
-            target_x_before_blinky = self.pacman.pacman_cell_x - 2
-            target_y_before_blinky = self.pacman.pacman_cell_y
-
-        elif self.pacman.direction == 0 and (self.pacman.pacman_cell_x + 2) < len(boards[0]):
-            target_x_before_blinky = self.pacman.pacman_cell_x + 2
-            target_y_before_blinky = self.pacman.pacman_cell_y
-
-        elif self.pacman.direction == 3 and (self.pacman.pacman_cell_y + 2) < len(boards):
-            target_x_before_blinky = self.pacman.pacman_cell_x
-            target_y_before_blinky = self.pacman.pacman_cell_y + 2
-
-        target_x = 2 * np.abs(self.blinky.ghost_cell_x - target_x_before_blinky)
-        target_y = 2 * np.abs(self.blinky.ghost_cell_y - target_y_before_blinky)
-
-        return target_x, target_y
+        return new_goal
 
 
 class OrangeGhost(Ghost):
     IMAGE_PASS = 'ghosts/orange.png'
 
+    def _get_image(self, width, height):
+        image = pygame.image.load(self.IMAGE_PASS)
+        scaled_image = pygame.transform.scale(image, (width, height))
+        return scaled_image
+
+    def _get_angry_goal(self):
+
+        goal = copy.deepcopy(self.pacman.get_cell_coordinates())
+        distant = self._get_vector_distance_between_cell(self.ghost_cell_x,self.ghost_cell_y, goal[0], goal[1])
+        if distant >= 8:
+            return goal
+        return copy.deepcopy(self.GHOST_BASE_GOAL)
+
+
+class BlueGhost(Ghost):
+    IMAGE_PASS = 'ghosts/blue.png'
+
     def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
-                 ghost_cell_coordinates, ghost_base_goal, pacman: PacMan):
-        super().__init__(screen, level_controller, ghost_cell_coordinates, ghost_base_goal)
-        self.pacman = pacman
+                 player_health: Health.Health, pacman: PacMan, ghost_cell_coordinates, ghost_base_goal, ghost: Ghost):
+        super().__init__(screen, level_controller, player_health, pacman, ghost_cell_coordinates, ghost_base_goal)
+        self.ghost = ghost
 
     def _get_image(self, width, height):
         image = pygame.image.load(self.IMAGE_PASS)
         scaled_image = pygame.transform.scale(image, (width, height))
         return scaled_image
 
-    def get_distance_between_cells(self, x1, x2, y1, y2):
-        return np.abs(x1 - x2) + np.abs(y1 - y2)
-
     def _get_angry_goal(self):
-        start = (self.ghost_cell_x, self.ghost_cell_y)
-        goal = (self.pacman.pacman_cell_x, self.pacman.pacman_cell_y)
-        g_score = {(x, y): np.inf for x, row in enumerate(boards) for y, _ in enumerate(row)}
-        g_score[start] = 0
-        f_score = {(x, y): np.inf for x, row in enumerate(boards) for y, _ in enumerate(row)}
-        f_score[start] = self.get_distance_between_cells(self.ghost_cell_x, goal[0],
-                                                         self.ghost_cell_y, goal[1])
-        pqueue = PriorityQueue()
-        allowed_path = {}
-        pqueue.put((f_score[start], start))
-        next_cell = ()
-        curr_cell = start
 
-        while not pqueue.empty():
-            item = pqueue.get()
+        direction = self.pacman.get_direction()
+        pacman_x, pacman_y = self.pacman.get_cell_coordinates()
+        blinky_x, blinky_y = self.ghost.ghost_cell_x, self.ghost.ghost_cell_y
 
-            if isinstance(item, tuple):
-                curr_cell = item[1]
+        if direction == Position.RIGHT:
+            target_x = pacman_x + 2
+            target_y = pacman_y
+        elif direction == Position.LEFT:
+            target_x = pacman_x - 2
+            target_y = pacman_y
+        elif direction == Position.DOWN:
+            target_x = pacman_x
+            target_y = pacman_y + 2
+        else:
+            target_x = pacman_x
+            target_y = pacman_y - 2
 
-            if curr_cell == goal:
-                break
+        vector_x = target_x - blinky_x
+        vector_y = target_y - blinky_y
 
-            if 0 <= curr_cell[0] - 1 < len(boards[0]) and 0 <= curr_cell[0] + 1 < len(boards[0]) and\
-                    0 <= curr_cell[1] - 1 < len(boards) and 0 <= curr_cell[1] + 1 < len(boards):
-                allowed_turns = self._turn_allow_update(curr_cell[0], curr_cell[0])
+        target_x = blinky_x + 2 * vector_x
+        target_y = blinky_y + 2 * vector_y
 
-            for i in range(len(allowed_turns)):
-                if i == 0:
-                    next_cell = (curr_cell[0] + 1, curr_cell[1])
-                if i == 1:
-                    next_cell = (curr_cell[0] - 1, curr_cell[1])
-                if i == 2:
-                    next_cell = (curr_cell[0], curr_cell[1] - 1)
-                if i == 3:
-                    next_cell = (curr_cell[0], curr_cell[1] + 1)
-
-                temp_g_score = g_score[curr_cell] + 1
-                temp_f_score = temp_g_score + self.get_distance_between_cells(next_cell[0], next_cell[1], goal[0], goal[1])
-
-                if temp_f_score < f_score.get(next_cell, np.inf):
-                    allowed_path[next_cell] = curr_cell
-                    g_score[next_cell] = temp_g_score
-                    f_score[next_cell] = temp_f_score
-                    pqueue.put((temp_f_score, next_cell))
-
-        final_path = {}
-        current = goal
-
-        while current != start:
-            final_path[allowed_path[current]] = current
-            current = allowed_path[current]
-
-        if len(final_path) < 8:
-            self.ghost_goal = (0, self.screen_height)
-
-        return self.ghost_goal
+        return [target_x, target_y]
 
 
-class PinkGhost(Ghost):
-    IMAGE_PASS = 'ghosts/pink.png'
-
-    def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
-                 ghost_cell_coordinates, ghost_base_goal, pacman: PacMan):
-        super().__init__(screen, level_controller, ghost_cell_coordinates, ghost_base_goal)
-        self.pacman = pacman
-        self.get_target = False
-
-    def _get_image(self, width, height):
-        image = pygame.image.load(self.IMAGE_PASS)
-        scaled_image = pygame.transform.scale(image, (width, height))
-        return scaled_image
-
-    def get_direction(self):
-        if ((self.direction == 0 and self.pacman.direction == 1) or
-                (self.direction == 1 and self.pacman.direction == 0)):
-
-            if self.turn_allow[2]:
-                self.direction = 2
-                self.get_target = False
-
-            elif self.turn_allow[3]:
-                self.direction = 3
-                self.get_target = False
-
-            elif self.turn_allow[0] and not self.pacman.direction == 0:
-                self.direction = 0
-                self.get_target = False
-
-            elif self.turn_allow[1] and not self.pacman.direction == 1:
-                self.direction = 1
-                self.get_target = False
-
-        elif ((self.direction == 2 and self.pacman.direction == 3) or
-              (self.direction == 3 and self.pacman.direction == 2)):
-
-            if self.turn_allow[0]:
-                self.direction = 0
-                self.get_target = False
-
-            elif self.turn_allow[1]:
-                self.direction = 1
-                self.get_target = False
-
-            elif self.turn_allow[2] and not self.pacman.direction == 2:
-                self.direction = 2
-                self.get_target = False
-
-            elif self.turn_allow[3] and not self.pacman.direction == 3:
-                self.direction = 3
-                self.get_target = False
-
-    def _get_angry_goal(self):
-        target_x, target_y = (self.pacman.pacman_cell_x, self.pacman.pacman_cell_y)
-        level_x = len(boards[0])
-        level_y = len(boards)
-
-        if self.pacman.direction == 0 and (self.pacman.pacman_cell_x + 4) < level_x:
-            target_x = self.pacman.pacman_cell_x + 4
-            target_y = self.pacman.pacman_cell_y
-
-        elif self.pacman.direction == 1 and self.pacman.pacman_cell_x > 4:
-            target_x = self.pacman.pacman_cell_x - 4
-            target_y = self.pacman.pacman_cell_y
-
-        elif self.pacman.direction == 3 and (self.pacman.pacman_cell_y + 4) < level_y:
-            target_x = self.pacman.pacman_cell_x
-            target_y = self.pacman.pacman_cell_y + 4
-
-        elif self.pacman.direction == 2 and self.pacman.pacman_cell_x > 4 and self.pacman.pacman_cell_y > 4:
-            target_x = self.pacman.pacman_cell_x - 4
-            target_y = self.pacman.pacman_cell_y - 4
-
-        if (np.abs(self.ghost_cell_x - self.pacman.pacman_cell_x) < 4 and self.ghost_cell_y == self.pacman.pacman_cell_y)\
-                or (np.abs(self.ghost_cell_y - self.pacman.pacman_cell_y) < 4 and self.ghost_cell_x == self.pacman.pacman_cell_x):
-            self.get_target = True
-
-        if self.get_target:
-            self.get_direction()
-
-        return target_x, target_y
-
-
-class Position(Enum):
-    RIGHT = auto()
-    LEFT = auto()
-    UP = auto()
-    DOWN = auto()
-    NOT_DEFINED = auto()
