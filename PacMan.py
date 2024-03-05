@@ -41,12 +41,17 @@ class PacMan:
 
         self.pacman_images = self.__set_pacman_image(self.pacman_width, self.pacman_height)
 
+        self.pacman_rect = self.get_pacman_rect()
+
+        self.pacman_dead = False
+
     def update_position(self):
         self.__pacman_rotation()
         self.__out_of_bound_controller()
         self.__pacman_move()
         self.__pacman_action()
         self.__draw_player()
+        self.pacman_rect = self.get_pacman_rect()
 
     def set_turn_right(self):
         self.turn = Position.RIGHT
@@ -244,5 +249,9 @@ class PacMan:
     def __get_coordinate_by_cell(cell_size, cell_coordinate, offset):
         return cell_size * (cell_coordinate + offset)
 
-
+    def get_pacman_rect(self):
+        pacman_rect = pygame.rect.Rect(
+            (self.pacman_center_x - self.pacman_width // 2, self.pacman_center_y - self.pacman_height // 2),
+            (self.pacman_width, self.pacman_height))
+        return pacman_rect
 
