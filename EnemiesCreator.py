@@ -1,9 +1,11 @@
 import copy
 import math
+import random
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 
 import Health
+from Observer import IObserver
 from Position import Position
 from level import LevelBuilder, LevelEnvironment
 import pygame
@@ -11,10 +13,11 @@ import pygame
 from PacMan import PacMan
 
 
-class Ghost(ABC):
-    GHOST_SPEED = 3
+class Ghost(IObserver, ABC):
+    GHOST_SPEED = 2
     OUT_OF_BOX_GOAL = [13, 12]
     BOX_GOAL = [13, 15]
+    ESCAPE_IMAGE = 'ghosts/powerup.png'
 
     def __init__(self, screen: pygame.surface.Surface,
                  level_controller: LevelBuilder.LevelController, player_health: Health.Health, pacman: PacMan,
@@ -52,25 +55,66 @@ class Ghost(ABC):
         self.turn_allow = self._turn_allow_update(self.ghost_cell_x, self.ghost_cell_y)
 
         self.start_timer = pygame.time.get_ticks()
-        self.mode_durations = [5000, 60000]
+        self.mode_durations = [7000, 20000]
         self.mode_index = 0
 
         self._make_opposite_access = False
+        self._is_escape_mode_active = False
+        self.escape_mode_duration = 7000
+        self.start_escape_timer = 0
+
+        pacman.add_observer(self)
+
+    def update_observer(self, event):
+        self._is_escape_mode_active = True
+        self.start_escape_timer = pygame.time.get_ticks()
 
     def update_position(self):
         self._goal_controller()
         self._rotation()
         self._out_of_bound_controller()
         self._move()
-        self._draw_player()
+        self._draw_ghost()
 
-    def _draw_player(self):
+    def _draw_ghost(self):
         ghost_image_x = self.ghost_center_x - self.ghost_width / 2
         ghost_image_y = self.ghost_center_y - self.ghost_height / 2
 
         image = self._get_image(self.ghost_width, self.ghost_height)
+        if self._is_escape_mode_active:
+            image = self._get_escape_image(self.ghost_width, self.ghost_height)
 
         self.screen.blit(image, (ghost_image_x, ghost_image_y))
+
+    def _get_escape_image(self, width, height):
+        image = pygame.image.load(self.ESCAPE_IMAGE)
+        scaled_image = pygame.transform.scale(image, (width, height))
+        return scaled_image
+
+    def _get_escape_mode_goal(self):
+        pacman_x, pacman_y = self.pacman.get_cell_coordinates()
+        ghost_x, ghost_y = self.ghost_cell_x, self.ghost_cell_y
+
+        target_x = ghost_x
+        target_y = ghost_y
+
+        vector_x = target_x - pacman_x
+        vector_y = target_y - pacman_y
+
+        target_x = pacman_x + 1.3 * vector_x
+        target_y = pacman_y + 1.3 * vector_y
+
+        random_side = random.randint(1, 5)
+        if random_side == 1:
+            target_x += 4
+        elif random_side == 2:
+            target_x -= 4
+        elif random_side == 3:
+            target_y += 4
+        elif random_side == 4:
+            target_y -= 4
+
+        return [target_x, target_y]
 
     def _goal_controller(self):
         if self.is_in_box:
@@ -80,19 +124,24 @@ class Ghost(ABC):
             return
 
         current_time = pygame.time.get_ticks()
+        if self._is_escape_mode_active:
+            if current_time - self.start_escape_timer >= self.escape_mode_duration:
+                self._is_escape_mode_active = False
+            else:
+                self.ghost_goal = self._get_escape_mode_goal()
+        else:
+            if current_time - self.start_timer >= self.mode_durations[self.mode_index]:
+                self.mode_index = (self.mode_index + 1) % len(self.mode_durations)
+                self._make_opposite_access = True
+                self.start_timer = current_time
 
-        if current_time - self.start_timer >= self.mode_durations[self.mode_index]:
-            self.mode_index = (self.mode_index + 1) % len(self.mode_durations)
-            self._make_opposite_access = True
-            self.start_timer = current_time
+            self._make_opposite_direction()
 
-        self._make_opposite_direction()
+            if self.mode_index == 0:
+                self.ghost_goal = copy.deepcopy(self.GHOST_BASE_GOAL)
 
-        if self.mode_index == 0:
-            self.ghost_goal = copy.deepcopy(self.GHOST_BASE_GOAL)
-
-        elif self.mode_index == 1:
-            self.ghost_goal = self._get_angry_goal()
+            elif self.mode_index == 1:
+                self.ghost_goal = self._get_angry_goal()
 
     def _make_opposite_direction(self):
         if self._make_opposite_access:
@@ -318,9 +367,8 @@ class OrangeGhost(Ghost):
         return scaled_image
 
     def _get_angry_goal(self):
-
         goal = copy.deepcopy(self.pacman.get_cell_coordinates())
-        distant = self._get_vector_distance_between_cell(self.ghost_cell_x,self.ghost_cell_y, goal[0], goal[1])
+        distant = self._get_vector_distance_between_cell(self.ghost_cell_x, self.ghost_cell_y, goal[0], goal[1])
         if distant >= 8:
             return goal
         return copy.deepcopy(self.GHOST_BASE_GOAL)
@@ -365,5 +413,3 @@ class BlueGhost(Ghost):
         target_y = blinky_y + 2 * vector_y
 
         return [target_x, target_y]
-
-
