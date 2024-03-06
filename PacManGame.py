@@ -10,6 +10,8 @@ from menu_pg.Options import Options
 from PacMan import PacMan
 from EnemiesCreator import RedGhost, OrangeGhost, PinkGhost, BlueGhost
 
+from Mode_Counter import ModeCounter
+
 
 class PacManGame:
     pygame.init()
@@ -20,6 +22,10 @@ class PacManGame:
     PINK_GHOST_CELL_COORDINATE = [12, 15]
     BLUE_GHOST_CELL_COORDINATE = [17, 15]
     ORANGE_GHOST_CELL_COORDINATE = [15, 15]
+    IMAGE_PASS_RED = 'ghosts/red.png'
+    IMAGE_PASS_PINK = 'ghosts/pink.png'
+    IMAGE_PASS_ORANGE = 'ghosts/orange.png'
+    IMAGE_PASS_BLUE = 'ghosts/blue.png'
 
     def __init__(self, width, height, back, image, ins):
         self.options = Options()
@@ -47,6 +53,8 @@ class PacManGame:
         clock = pygame.time.Clock()
         level_loop_counter = LevelLoopCounter()
 
+        mode_counter = ModeCounter()
+
         score = Score.PlayerScore(level_bar_surface)
         health = Health(level_bar_surface)
 
@@ -61,18 +69,18 @@ class PacManGame:
 
         red_ghost = RedGhost(level_surface, level_controller, health, pacman,
                              self.RED_GHOST_CELL_COORDINATE,
-                             [cell_len_x, 0])
+                             [cell_len_x, 0], self.IMAGE_PASS_RED, mode_counter, score)
 
         blue_ghost = BlueGhost(level_surface, level_controller, health, pacman,
                                self.BLUE_GHOST_CELL_COORDINATE,
-                               [cell_len_x, cell_len_y], red_ghost)
+                               [cell_len_x, cell_len_y], red_ghost, self.IMAGE_PASS_BLUE, mode_counter, score)
 
         pink_ghost = PinkGhost(level_surface, level_controller, health, pacman,
                                self.PINK_GHOST_CELL_COORDINATE,
-                               [0, 0])
+                               [0, 0], self.IMAGE_PASS_PINK,  mode_counter, score)
         orange_ghost = OrangeGhost(level_surface, level_controller, health, pacman,
                                    self.ORANGE_GHOST_CELL_COORDINATE,
-                                   [0, cell_len_y])
+                                   [0, cell_len_y], self.IMAGE_PASS_ORANGE, mode_counter, score)
 
         ghosts = [red_ghost, blue_ghost, pink_ghost, orange_ghost]
 
@@ -90,6 +98,7 @@ class PacManGame:
                 level_surface.blit(self.background_image, (0, 0))
 
             level_loop_counter.increase()
+            mode_counter.increase()
             level_controller.update()
             level_bar.update()
             pacman.update_position()
