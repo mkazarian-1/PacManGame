@@ -4,6 +4,8 @@ from abc import ABC, abstractmethod
 from enum import Enum, auto
 
 import Health
+import Mode_Counter
+import Score
 from Position import Position
 from level import LevelBuilder, LevelEnvironment
 import pygame
@@ -348,13 +350,6 @@ class Ghost(ABC):
 
 
 class RedGhost(Ghost):
-    IMAGE_PASS = 'ghosts/red.png'
-
-    def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
-                 player_health: Health.Health, pacman: PacMan, ghost_cell_coordinates, ghost_base_goal, mode_counter,
-                 score):
-        super().__init__(screen, level_controller, player_health, pacman, ghost_cell_coordinates, ghost_base_goal,
-                         self.IMAGE_PASS, mode_counter, score)
 
     def _get_image(self, width, height, img):
         image = pygame.image.load(img)
@@ -366,13 +361,6 @@ class RedGhost(Ghost):
 
 
 class PinkGhost(Ghost):
-    IMAGE_PASS = 'ghosts/pink.png'
-
-    def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
-                 player_health: Health.Health, pacman: PacMan, ghost_cell_coordinates, ghost_base_goal, mode_counter,
-                 score):
-        super().__init__(screen, level_controller, player_health, pacman, ghost_cell_coordinates, ghost_base_goal,
-                         self.IMAGE_PASS, mode_counter, score)
 
     def _get_image(self, width, height, img):
         image = pygame.image.load(img)
@@ -396,13 +384,6 @@ class PinkGhost(Ghost):
 
 
 class OrangeGhost(Ghost):
-    IMAGE_PASS = 'ghosts/orange.png'
-
-    def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
-                 player_health: Health.Health, pacman: PacMan, ghost_cell_coordinates, ghost_base_goal, mode_counter,
-                 score):
-        super().__init__(screen, level_controller, player_health, pacman, ghost_cell_coordinates, ghost_base_goal,
-                         self.IMAGE_PASS, mode_counter, score)
 
     def _get_image(self, width, height, img):
         image = pygame.image.load(img)
@@ -419,13 +400,12 @@ class OrangeGhost(Ghost):
 
 
 class BlueGhost(Ghost):
-    IMAGE_PASS = 'ghosts/blue.png'
 
     def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
                  player_health: Health.Health, pacman: PacMan, ghost_cell_coordinates, ghost_base_goal, ghost: Ghost,
-                 mode_counter, score):
+                 img, mode_counter, score):
         super().__init__(screen, level_controller, player_health, pacman, ghost_cell_coordinates, ghost_base_goal,
-                         self.IMAGE_PASS, mode_counter, score)
+                         img, mode_counter, score)
         self.ghost = ghost
 
     def _get_image(self, width, height, img):
