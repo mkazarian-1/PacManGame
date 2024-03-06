@@ -1,17 +1,18 @@
 import pygame
 
+from Observer import Observable
 from Position import Position
 from level import LevelBuilder, LevelEnvironment, LevelLoopCounter
 from enum import Enum, auto
 
 
-class PacMan:
+class PacMan (Observable):
     PACMAN_SPEED = 2.5
 
-    def __init__(self, screen: pygame.surface.Surface,
-                 level_controller: LevelBuilder.LevelController,
+    def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
                  level_loop_counter: LevelLoopCounter.LevelLoopCounter):
 
+        super().__init__()
         self.screen = screen
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
@@ -195,6 +196,8 @@ class PacMan:
         if self.__is_cell_action(level_element):
             level_element.action()
             self.level_controller.delete_cell(self.pacman_cell_x, self.pacman_cell_y)
+            if type(level_element) is LevelEnvironment.Energiser:
+                self.notify_observers("power_pellet_eaten")
 
     def __out_of_bound_controller(self):
         if self.direction == Position.RIGHT and self.pacman_cell_x + 1 == (self.cell_len_x - 1):
