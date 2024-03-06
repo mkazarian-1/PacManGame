@@ -1,11 +1,13 @@
 import copy
 import math
+import random
 from abc import ABC, abstractmethod
 from enum import Enum, auto
 
 import Health
 import Mode_Counter
 import Score
+from Observer import IObserver
 from Position import Position
 from level import LevelBuilder, LevelEnvironment
 import pygame
@@ -13,15 +15,17 @@ import pygame
 from PacMan import PacMan
 
 
+
 class GhostCount:
     eaten_ghosts_count = 0
     ghost_price = 0
 
-
-class Ghost(ABC):
+class Ghost(IObserver, ABC):
     GHOST_SPEED = 2
     OUT_OF_BOX_GOAL = [13, 12]
     BOX_GOAL = [13, 15]
+    ESCAPE_IMAGE = 'ghosts/powerup.png'
+    
     MODE_DURATION_1 = [0, 420]
     MODE_DURATION_2 = [420, 1620]
     MODE_DURATION_3 = [1620, 2040]
@@ -66,6 +70,10 @@ class Ghost(ABC):
         # 0-Right 1-Left 2-Up 3-Down
         self.turn_allow = self._turn_allow_update(self.ghost_cell_x, self.ghost_cell_y)
 
+
+        self.start_timer = pygame.time.get_ticks()
+        self.mode_durations = [7000, 20000]
+
         self.mode_index = 0
         self.mode_durations = [
             self.MODE_DURATION_1,
@@ -77,9 +85,7 @@ class Ghost(ABC):
             self.MODE_DURATION_7,
             self.MODE_DURATION_8
         ]
-
-        self._make_opposite_access = False
-
+        
         self.spooked_img = "ghosts/powerup.png"
         self.dead_img = "ghosts/dead.png"
         self.ghost_img = ghost_img
@@ -98,6 +104,17 @@ class Ghost(ABC):
         self.mode_counter = mode_counter
         self.score = score
 
+        self._make_opposite_access = False
+        self._is_escape_mode_active = False
+        self.escape_mode_duration = 7000
+        self.start_escape_timer = 0
+
+        pacman.add_observer(self)
+
+    def update_observer(self, event):
+        self._is_escape_mode_active = True
+        self.start_escape_timer = pygame.time.get_ticks()
+
     def update_position(self):
         self.ghost_rect = self.get_ghost_rect()
         self.change_score()
@@ -109,15 +126,50 @@ class Ghost(ABC):
         self._rotation()
         self._out_of_bound_controller()
         self._move()
-        self._draw_player()
+        self._draw_ghost()
 
-    def _draw_player(self):
+    def _draw_ghost(self):
         ghost_image_x = self.ghost_center_x - self.ghost_width / 2
         ghost_image_y = self.ghost_center_y - self.ghost_height / 2
 
         image = self._get_image(self.ghost_width, self.ghost_height, self.ghost_img)
 
+        current_time = pygame.time.get_ticks()
+        if self._is_escape_mode_active and (((current_time - self.start_escape_timer) < self.escape_mode_duration * 0.8)
+                                            or (self.start_escape_timer - current_time) % 300 > 150):
+            image = self._get_escape_image(self.ghost_width, self.ghost_height)
+
         self.screen.blit(image, (ghost_image_x, ghost_image_y))
+
+    def _get_escape_image(self, width, height):
+        image = pygame.image.load(self.ESCAPE_IMAGE)
+        scaled_image = pygame.transform.scale(image, (width, height))
+        return scaled_image
+
+    def _get_escape_mode_goal(self):
+        pacman_x, pacman_y = self.pacman.get_cell_coordinates()
+        ghost_x, ghost_y = self.ghost_cell_x, self.ghost_cell_y
+
+        target_x = ghost_x
+        target_y = ghost_y
+
+        vector_x = target_x - pacman_x
+        vector_y = target_y - pacman_y
+
+        target_x = pacman_x + 1.3 * vector_x
+        target_y = pacman_y + 1.3 * vector_y
+
+        random_side = random.randint(1, 5)
+        if random_side == 1:
+            target_x += 4
+        elif random_side == 2:
+            target_x -= 4
+        elif random_side == 3:
+            target_y += 4
+        elif random_side == 4:
+            target_y -= 4
+
+        return [target_x, target_y]
 
     def _goal_controller(self):
         if self.is_in_box and not self.ghost_dead:
@@ -125,7 +177,6 @@ class Ghost(ABC):
             if self.ghost_cell_x == self.ghost_goal[0] and self.ghost_cell_y == self.ghost_goal[1]:
                 self.is_in_box = False
             return
-
         if not self.ghost_dead:
 
             if (self.mode_index < len(self.mode_durations) and self.mode_counter.get()
@@ -391,7 +442,6 @@ class OrangeGhost(Ghost):
         return scaled_image
 
     def _get_angry_goal(self):
-
         goal = copy.deepcopy(self.pacman.get_cell_coordinates())
         distant = self._get_vector_distance_between_cell(self.ghost_cell_x, self.ghost_cell_y, goal[0], goal[1])
         if distant >= 8:
@@ -439,5 +489,3 @@ class BlueGhost(Ghost):
         target_y = blinky_y + 2 * vector_y
 
         return [target_x, target_y]
-
-

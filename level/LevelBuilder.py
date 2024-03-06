@@ -3,6 +3,7 @@ import pygame
 import level.LevelEnvironment as LevelEnvironment
 import Score
 from Health import Health
+from level.EndGameController import EndGameController
 
 
 class LevelBuilder:
@@ -17,6 +18,7 @@ class LevelBuilder:
         self.cell_height = self.height / len(self.level_map)
         self.cell_width = self.width / len(self.level_map[0])
         self.score = score
+        self.end_game_controller = EndGameController()
 
     def build(self):
 
@@ -29,11 +31,11 @@ class LevelBuilder:
                 if self.level_map[y][x] == 1:
                     level_environment[y][x] = (LevelEnvironment
                                                .Food(self.screen, x, y, self.cell_width, self.cell_height, "white",
-                                                     self.score))
+                                                     self.score, self.end_game_controller))
                 elif self.level_map[y][x] == 2:
                     level_environment[y][x] = (LevelEnvironment
                                                .Energiser(self.screen, x, y, self.cell_width, self.cell_height,
-                                                          self.level_loop_counter, "white", self.score))
+                                                          self.level_loop_counter, "white", self.end_game_controller))
                 elif self.level_map[y][x] == 3:
                     level_environment[y][x] = (LevelEnvironment
                                                .Wall(self.screen, x, y, self.cell_width, self.cell_height, 1,

@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 import pygame
 
 import Score
+from level.EndGameController import EndGameController
 
 
 class IDrawAble(ABC):
@@ -23,7 +24,8 @@ class IWallAble(ABC):
 
 class Food(IDrawAble, IActionable):
 
-    def __init__(self, screen, x, y, cell_width, cell_height, color, score: Score.PlayerScore):
+    def __init__(self, screen, x, y, cell_width, cell_height, color, score: Score.PlayerScore,
+                 end_game_controller: EndGameController):
         self.screen = screen
         self.x = x
         self.y = y
@@ -31,9 +33,12 @@ class Food(IDrawAble, IActionable):
         self.cell_height = cell_height
         self.color = color
         self.score = score
+        self.end_game_controller = end_game_controller
+        self.end_game_controller.increase_amount_dots(1)
 
     def action(self):
         self.score.increase_score(10)
+        self.end_game_controller.decrease_amount_dots(1)
 
     def draw(self):
         pygame.draw.circle(self.screen, self.color,
@@ -42,7 +47,8 @@ class Food(IDrawAble, IActionable):
 
 
 class Energiser(IDrawAble, IActionable):
-    def __init__(self, screen, x, y, cell_width, cell_height, level_loop_counter, color, score: Score.PlayerScore):
+    def __init__(self, screen, x, y, cell_width, cell_height, level_loop_counter, color,
+                 end_game_controller: EndGameController):
         self.screen = screen
         self.x = x
         self.y = y
@@ -50,10 +56,11 @@ class Energiser(IDrawAble, IActionable):
         self.cell_height = cell_height
         self.level_loop_counter = level_loop_counter
         self.color = color
-        self.score = score
+        self.end_game_controller = end_game_controller
+        self.end_game_controller.increase_amount_dots(1)
 
     def action(self):
-        self.score.increase_score(100)
+        self.end_game_controller.decrease_amount_dots(1)
 
     def draw(self):
         if self.level_loop_counter.get() > 10:
