@@ -81,7 +81,10 @@ class Ghost(IObserver, ABC):
         ghost_image_y = self.ghost_center_y - self.ghost_height / 2
 
         image = self._get_image(self.ghost_width, self.ghost_height)
-        if self._is_escape_mode_active:
+
+        current_time = pygame.time.get_ticks()
+        if self._is_escape_mode_active and (((current_time - self.start_escape_timer) < self.escape_mode_duration * 0.8)
+                                            or (self.start_escape_timer - current_time) % 300 > 150):
             image = self._get_escape_image(self.ghost_width, self.ghost_height)
 
         self.screen.blit(image, (ghost_image_x, ghost_image_y))
