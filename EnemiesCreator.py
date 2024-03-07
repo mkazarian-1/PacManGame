@@ -15,17 +15,18 @@ import pygame
 from PacMan import PacMan
 
 
-
 class GhostCount:
     eaten_ghosts_count = 0
     ghost_price = 0
+
 
 class Ghost(IObserver, ABC):
     GHOST_SPEED = 2
     OUT_OF_BOX_GOAL = [13, 12]
     BOX_GOAL = [13, 15]
-    ESCAPE_IMAGE = 'ghosts/powerup.png'
-    
+    ESCAPE_IMAGE = "ghosts/powerup.png"
+    DEAD_IMAGE = "ghosts/dead.png"
+
     MODE_DURATION_1 = [0, 420]
     MODE_DURATION_2 = [420, 1620]
     MODE_DURATION_3 = [1620, 2040]
@@ -37,7 +38,7 @@ class Ghost(IObserver, ABC):
 
     def __init__(self, screen: pygame.surface.Surface,
                  level_controller: LevelBuilder.LevelController, player_health: Health.Health, pacman: PacMan,
-                 ghost_cell_coordinates, ghost_base_goal, ghost_img, mode_counter, score):
+                 ghost_cell_coordinates, ghost_base_goal, mode_counter, score):
         self.screen = screen
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
@@ -70,7 +71,6 @@ class Ghost(IObserver, ABC):
         # 0-Right 1-Left 2-Up 3-Down
         self.turn_allow = self._turn_allow_update(self.ghost_cell_x, self.ghost_cell_y)
 
-
         self.start_timer = pygame.time.get_ticks()
         self.mode_durations = [7000, 20000]
 
@@ -85,26 +85,22 @@ class Ghost(IObserver, ABC):
             self.MODE_DURATION_7,
             self.MODE_DURATION_8
         ]
-        
-        self.spooked_img = "ghosts/powerup.png"
-        self.dead_img = "ghosts/dead.png"
-        self.ghost_img = ghost_img
-        self.ghost_img_copy = copy.deepcopy(ghost_img)
+        # self.ghost_img_copy = copy.deepcopy(ghost_img)
 
         self.ghost_rect = self.get_ghost_rect()
 
-        self.ghost_dead = False
+        self._is_ghost_dead = False
 
         self.usual_speed = self.GHOST_SPEED
-        self.update_speed = self.usual_speed * 3
-        self.startle_speed = 1.5
+        self.update_speed = self.GHOST_SPEED * 3
 
         self.is_run = True
 
         self.mode_counter = mode_counter
         self.score = score
 
-        self._make_opposite_access = False
+        self._is_make_opposite_access = False
+
         self._is_escape_mode_active = False
         self.escape_mode_duration = 7000
         self.start_escape_timer = 0
@@ -114,12 +110,11 @@ class Ghost(IObserver, ABC):
     def update_observer(self, event):
         self._is_escape_mode_active = True
         self.start_escape_timer = pygame.time.get_ticks()
+        GhostCount.eaten_ghosts_count = 0
 
     def update_position(self):
         self.ghost_rect = self.get_ghost_rect()
-        self.change_score()
-        self.pacman_collision_powerup()
-        # self.kill_pacman()
+        self.collision_controller()
         self.is_ghost_in_box()
 
         self._goal_controller()
@@ -132,19 +127,19 @@ class Ghost(IObserver, ABC):
         ghost_image_x = self.ghost_center_x - self.ghost_width / 2
         ghost_image_y = self.ghost_center_y - self.ghost_height / 2
 
-        image = self._get_image(self.ghost_width, self.ghost_height, self.ghost_img)
+        image = self._get_image(self.ghost_width, self.ghost_height, self._get_ghost_base_img_pass())
 
         current_time = pygame.time.get_ticks()
-        if self._is_escape_mode_active and (((current_time - self.start_escape_timer) < self.escape_mode_duration * 0.8)
-                                            or (self.start_escape_timer - current_time) % 300 > 150):
-            image = self._get_escape_image(self.ghost_width, self.ghost_height)
+
+        if self._is_ghost_dead:
+            image = self._get_image(self.ghost_width, self.ghost_height, self.DEAD_IMAGE)
+
+        elif self._is_escape_mode_active and (
+                ((current_time - self.start_escape_timer) < self.escape_mode_duration * 0.8)
+                or (self.start_escape_timer - current_time) % 300 > 150):
+            image = self._get_image(self.ghost_width, self.ghost_height, self.ESCAPE_IMAGE)
 
         self.screen.blit(image, (ghost_image_x, ghost_image_y))
-
-    def _get_escape_image(self, width, height):
-        image = pygame.image.load(self.ESCAPE_IMAGE)
-        scaled_image = pygame.transform.scale(image, (width, height))
-        return scaled_image
 
     def _get_escape_mode_goal(self):
         pacman_x, pacman_y = self.pacman.get_cell_coordinates()
@@ -172,46 +167,61 @@ class Ghost(IObserver, ABC):
         return [target_x, target_y]
 
     def _goal_controller(self):
-        if self.is_in_box and not self.ghost_dead:
+        if self.is_in_box:
             self.ghost_goal = copy.deepcopy(self.OUT_OF_BOX_GOAL)
             if self.ghost_cell_x == self.ghost_goal[0] and self.ghost_cell_y == self.ghost_goal[1]:
                 self.is_in_box = False
+                self.mode_index = 0
             return
-        if not self.ghost_dead:
 
-            if (self.mode_index < len(self.mode_durations) and self.mode_counter.get()
-                    == self.mode_durations[self.mode_index][1]):
-                self.mode_index += 1
-                self._make_opposite_access = True
-
-            self._make_opposite_direction()
-
-            if self.mode_index % 2 == 0 and self.mode_index < len(self.mode_durations):
-                self.ghost_goal = copy.deepcopy(self.GHOST_BASE_GOAL)
-
-            else:
-                self.ghost_goal = self._get_angry_goal()
-        else:
+        if self._is_ghost_dead:
             self.ghost_goal = self.BOX_GOAL
+            self._is_escape_mode_active = False
+            self.mode_index = 0
+            return
+
+        if self._is_escape_mode_active:
+            current_time = pygame.time.get_ticks()
+
+            if current_time - self.start_escape_timer >= self.escape_mode_duration:
+                self._is_escape_mode_active = False
+                self.mode_index = 0
+            else:
+                self.ghost_goal = self._get_escape_mode_goal()
+
+            return
+
+        if (self.mode_index < len(self.mode_durations) and self.mode_counter.get()
+                == self.mode_durations[self.mode_index][1]):
+            self.mode_index += 1
+            self._is_make_opposite_access = True
+
+        self._make_opposite_direction()
+
+        if self.mode_index % 2 == 0 and self.mode_index < len(self.mode_durations):
+            self.ghost_goal = copy.deepcopy(self.GHOST_BASE_GOAL)
+
+        else:
+            self.ghost_goal = self._get_angry_goal()
 
     def _make_opposite_direction(self):
-        if self._make_opposite_access:
+        if self._is_make_opposite_access:
             if self.direction == Position.RIGHT and self.turn_allow[1]:
                 self.direction = Position.LEFT
-                self._make_opposite_access = False
+                self._is_make_opposite_access = False
             elif self.direction == Position.LEFT and self.turn_allow[0]:
                 self.direction = Position.RIGHT
-                self._make_opposite_access = False
+                self._is_make_opposite_access = False
             elif self.direction == Position.UP and self.turn_allow[3]:
                 self.direction = Position.DOWN
-                self._make_opposite_access = False
+                self._is_make_opposite_access = False
             elif self.direction == Position.DOWN and self.turn_allow[2]:
                 self.direction = Position.UP
-                self._make_opposite_access = False
+                self._is_make_opposite_access = False
 
     def _move(self):
         if self.direction == Position.RIGHT and self.turn_allow[0]:  # RIGHT
-            if (self.ghost_center_x + self.GHOST_SPEED
+            if (self.ghost_center_x + self.usual_speed
                     >= self._get_coordinate_by_cell(self.cell_width, self.ghost_cell_x + 1, 0.5)):
 
                 self.ghost_cell_x = self.ghost_cell_x + 1
@@ -222,11 +232,11 @@ class Ghost(IObserver, ABC):
                 self.rotation_allow = True
 
             else:
-                self.ghost_center_x = self.ghost_center_x + self.GHOST_SPEED
+                self.ghost_center_x = self.ghost_center_x + self.usual_speed
                 self.rotation_allow = False
 
         elif self.direction == Position.LEFT and self.turn_allow[1]:  # LEFT
-            if (self.ghost_center_x - self.GHOST_SPEED
+            if (self.ghost_center_x - self.usual_speed
                     <= self._get_coordinate_by_cell(self.cell_width, self.ghost_cell_x - 1, 0.5)):
 
                 self.ghost_cell_x = self.ghost_cell_x - 1
@@ -238,11 +248,11 @@ class Ghost(IObserver, ABC):
                 self.rotation_allow = True
 
             else:
-                self.ghost_center_x = self.ghost_center_x - self.GHOST_SPEED
+                self.ghost_center_x = self.ghost_center_x - self.usual_speed
                 self.rotation_allow = False
 
         elif self.direction == Position.UP and self.turn_allow[2]:  # UP
-            if (self.ghost_center_y - self.GHOST_SPEED
+            if (self.ghost_center_y - self.usual_speed
                     <= self._get_coordinate_by_cell(self.cell_height, self.ghost_cell_y - 1, 0.5)):
 
                 self.ghost_cell_y = self.ghost_cell_y - 1
@@ -254,11 +264,11 @@ class Ghost(IObserver, ABC):
                 self.rotation_allow = True
 
             else:
-                self.ghost_center_y = self.ghost_center_y - self.GHOST_SPEED
+                self.ghost_center_y = self.ghost_center_y - self.usual_speed
                 self.rotation_allow = False
 
         elif self.direction == Position.DOWN and self.turn_allow[3]:  # DOWN
-            if (self.ghost_center_y + self.GHOST_SPEED
+            if (self.ghost_center_y + self.usual_speed
                     >= self._get_coordinate_by_cell(self.cell_height, self.ghost_cell_y + 1, 0.5)):
 
                 self.ghost_cell_y = self.ghost_cell_y + 1
@@ -270,7 +280,7 @@ class Ghost(IObserver, ABC):
                 self.rotation_allow = True
 
             else:
-                self.ghost_center_y = self.ghost_center_y + self.GHOST_SPEED
+                self.ghost_center_y = self.ghost_center_y + self.usual_speed
                 self.rotation_allow = False
 
     def _rotation(self):
@@ -342,16 +352,21 @@ class Ghost(IObserver, ABC):
                 not self._is_cell_wall(self.level_controller.get_cell(cell_x, cell_y + 1))]
 
     def _is_cell_wall(self, cell):
-        if (self.is_in_box or self.ghost_dead) and type(cell) is LevelEnvironment.Door:
+        if (self.is_in_box or self._is_ghost_dead) and type(cell) is LevelEnvironment.Door:
             return False
         return issubclass(type(cell), LevelEnvironment.IWallAble)
 
-    @abstractmethod
-    def _get_image(self, width, height, img):
-        pass
+    def _get_image(self, width, height, img_path):
+        image = pygame.image.load(img_path)
+        scaled_image = pygame.transform.scale(image, (width, height))
+        return scaled_image
 
     @abstractmethod
     def _get_angry_goal(self):
+        pass
+
+    @abstractmethod
+    def _get_ghost_base_img_pass(self):
         pass
 
     @staticmethod
@@ -370,53 +385,42 @@ class Ghost(IObserver, ABC):
     def is_collision(self):
         return pygame.Rect.colliderect(self.ghost_rect, self.pacman.pacman_rect)
 
-    def pacman_collision_powerup(self):
-        if self.is_collision() and not self.ghost_dead and not self.is_in_box:  # and powerup
-            self.ghost_img = self.dead_img
-            self.ghost_dead = True
-            self.GHOST_SPEED = self.update_speed
+    def collision_controller(self):
+        if self.is_collision() and not self._is_ghost_dead:
+            if self._is_escape_mode_active:
+                self._is_ghost_dead = True
+                self.change_score()
+                self.usual_speed = self.update_speed
+            else:
+                self.health.decrease_health()
 
     def change_score(self):
-        if self.is_collision() and not self.ghost_dead:  # and powerup
-            GhostCount.eaten_ghosts_count += 1
-            GhostCount.ghost_price = 100 * (2 ** GhostCount.eaten_ghosts_count)
-            self.score.increase_score(GhostCount.ghost_price)
-
-        # if not powerup:  GhostCount.eaten_ghosts_count = 0
+        GhostCount.eaten_ghosts_count += 1
+        GhostCount.ghost_price = 100 * (2 ** GhostCount.eaten_ghosts_count)
+        self.score.increase_score(GhostCount.ghost_price)
 
     def is_ghost_in_box(self):
         if 12 <= self.ghost_cell_x <= 17 and 14 <= self.ghost_cell_y <= 16:
-            self.ghost_dead = False
+            self._is_ghost_dead = False
             self.is_in_box = True
-            self.ghost_img = self.ghost_img_copy
-            self.GHOST_SPEED = self.usual_speed
-
-    def kill_pacman(self):
-        if self.is_collision() and not self.pacman.pacman_dead:   # not powerup
-            self.health.decrease_health()
-            self.pacman.pacman_dead = True     # restart game pacman.dead = False
-
-    # def is_powerup_img(self):
-    #     self.ghost_img = self.spooked_img     # if powerup change an ghost`s image
+            self.usual_speed = self.GHOST_SPEED
 
 
 class RedGhost(Ghost):
+    IMAGE_PASS_RED = 'ghosts/red.png'
 
-    def _get_image(self, width, height, img):
-        image = pygame.image.load(img)
-        scaled_image = pygame.transform.scale(image, (width, height))
-        return scaled_image
+    def _get_ghost_base_img_pass(self):
+        return self.IMAGE_PASS_RED
 
     def _get_angry_goal(self):
         return self.pacman.get_cell_coordinates()
 
 
 class PinkGhost(Ghost):
+    IMAGE_PASS_PINK = 'ghosts/pink.png'
 
-    def _get_image(self, width, height, img):
-        image = pygame.image.load(img)
-        scaled_image = pygame.transform.scale(image, (width, height))
-        return scaled_image
+    def _get_ghost_base_img_pass(self):
+        return self.IMAGE_PASS_PINK
 
     def _get_angry_goal(self):
         direction = self.pacman.get_direction()
@@ -435,11 +439,10 @@ class PinkGhost(Ghost):
 
 
 class OrangeGhost(Ghost):
+    IMAGE_PASS_ORANGE = 'ghosts/orange.png'
 
-    def _get_image(self, width, height, img):
-        image = pygame.image.load(img)
-        scaled_image = pygame.transform.scale(image, (width, height))
-        return scaled_image
+    def _get_ghost_base_img_pass(self):
+        return self.IMAGE_PASS_ORANGE
 
     def _get_angry_goal(self):
         goal = copy.deepcopy(self.pacman.get_cell_coordinates())
@@ -450,18 +453,17 @@ class OrangeGhost(Ghost):
 
 
 class BlueGhost(Ghost):
+    IMAGE_PASS_BLUE = 'ghosts/blue.png'
+
+    def _get_ghost_base_img_pass(self):
+        return self.IMAGE_PASS_BLUE
 
     def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
                  player_health: Health.Health, pacman: PacMan, ghost_cell_coordinates, ghost_base_goal, ghost: Ghost,
-                 img, mode_counter, score):
+                 mode_counter, score):
         super().__init__(screen, level_controller, player_health, pacman, ghost_cell_coordinates, ghost_base_goal,
-                         img, mode_counter, score)
+                         mode_counter, score)
         self.ghost = ghost
-
-    def _get_image(self, width, height, img):
-        image = pygame.image.load(img)
-        scaled_image = pygame.transform.scale(image, (width, height))
-        return scaled_image
 
     def _get_angry_goal(self):
 
