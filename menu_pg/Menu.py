@@ -1,6 +1,5 @@
 import pygame
 import sys
-from PacManGame import PacManGame
 from menu_pg.Options import Options
 
 pygame.init()
@@ -73,6 +72,7 @@ class Menu:
 
         menu_text = get_font(65, ind).render("MAIN MENU", True, "#f4cd33")
         menu_rect = menu_text.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) - (300 * ind)))
+        self.screen.blit(menu_text, menu_rect)
 
         play_button = get_font(65, ind).render("PLAY", True, (255, 255, 255))
         self.play_rect = play_button.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) - (150 * ind)))
@@ -98,12 +98,12 @@ class Menu:
             quit_button = get_font(65, ind).render("QUIT", True, (255, 242, 204))
             self.screen.blit(quit_button, self.quit_rect)
 
-        self.screen.blit(menu_text, menu_rect)
-
     def option(self):
         self.options.start()
 
     def play(self):
-        pacman = PacManGame(self.WIDTH, self.HEIGHT, self.background, self.background_image,
+        from PacManGame import PacManGame
+        pacman = PacManGame(self.current_screen_size, self.background, self.background_image,
                             self.options.image_inserted)
         pacman.start_game()
+
