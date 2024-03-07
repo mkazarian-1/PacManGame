@@ -171,7 +171,7 @@ class Ghost(IObserver, ABC):
             self.ghost_goal = copy.deepcopy(self.OUT_OF_BOX_GOAL)
             if self.ghost_cell_x == self.ghost_goal[0] and self.ghost_cell_y == self.ghost_goal[1]:
                 self.is_in_box = False
-                self.mode_index = 0
+                # self.mode_index = 0
             return
 
         if self._is_ghost_dead:
