@@ -171,12 +171,13 @@ class Ghost(IObserver, ABC):
             self.ghost_goal = copy.deepcopy(self.OUT_OF_BOX_GOAL)
             if self.ghost_cell_x == self.ghost_goal[0] and self.ghost_cell_y == self.ghost_goal[1]:
                 self.is_in_box = False
-                self.mode_index = 0
+                # self.mode_index = 0
             return
 
         if self._is_ghost_dead:
             self.ghost_goal = self.BOX_GOAL
             self._is_escape_mode_active = False
+            self.mode_counter.reset()
             self.mode_index = 0
             return
 
@@ -186,6 +187,7 @@ class Ghost(IObserver, ABC):
             if current_time - self.start_escape_timer >= self.escape_mode_duration:
                 self._is_escape_mode_active = False
                 self.mode_index = 0
+                self.mode_counter.reset()
             else:
                 self.ghost_goal = self._get_escape_mode_goal()
 
@@ -378,7 +380,7 @@ class Ghost(IObserver, ABC):
         return math.sqrt((cell_second_x - cell_first_x) ** 2 + (cell_second_y - cell_first_y) ** 2)
 
     def get_ghost_rect(self):
-        ghost_rect = pygame.rect.Rect((self.ghost_center_x, self.ghost_center_y - self.ghost_height // 2),
+        ghost_rect = pygame.rect.Rect((self.ghost_center_x - self.ghost_width//2, self.ghost_center_y - self.ghost_height//2),
                                       (self.ghost_width, self.ghost_height))
         return ghost_rect
 
