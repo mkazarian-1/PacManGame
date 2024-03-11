@@ -22,23 +22,20 @@ class PacManGame:
     BLUE_GHOST_CELL_COORDINATE = [17, 15]
     ORANGE_GHOST_CELL_COORDINATE = [15, 15]
 
-    def __init__(self, screen_size, back, image, ins):
-        self.options = Options()
-        self.current_screen_size = screen_size
-        self.background = back
-        self.image_inserted = self.options.is_image_inserted()
-        self.background_image = image
-        self.ins = ins
-
-
+    def __init__(self, screen_settings):
+        self.screen_settings = screen_settings
+        self.options = Options(self.screen_settings)
+        self.current_screen_size = self.screen_settings.get_screen_size()
+        self.background = self.screen_settings.get_background_color()
+        self.image_inserted = self.screen_settings.is_image_inserted()
+        self.background_image = self.screen_settings.get_background_image()
         self.play_rect = None
         self.menu_rect = None
 
     def set_screen_size(self):
-        self.HEIGHT, self.WIDTH = self.options.SCREEN_SIZES[self.current_screen_size]
+        self.HEIGHT, self.WIDTH = self.screen_settings.SCREEN_SIZES[self.current_screen_size]
 
     def start_game(self):
-
         pygame.init()
         self.set_screen_size()
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
@@ -89,7 +86,8 @@ class PacManGame:
 
             level_surface.fill(self.background)
             level_bar_surface.fill(self.background)
-            if self.ins:
+
+            if self.image_inserted:
                 level_surface.blit(self.background_image, (0, 0))
 
             level_loop_counter.increase()
@@ -101,7 +99,6 @@ class PacManGame:
                 ghost.update_position()
 
             for event in pygame.event.get():
-                print(self.score.get_score())
                 if event.type == pygame.QUIT:
                     running = False
 
@@ -114,8 +111,6 @@ class PacManGame:
                         pacman.set_turn_up()
                     elif event.key == pygame.K_DOWN:
                         pacman.set_turn_down()
-                    elif event.key == pygame.K_SPACE:
-                        health.decrease_health()
                     elif event.key == pygame.K_ESCAPE:
                         self.back_to_menu()
 
@@ -161,7 +156,7 @@ class PacManGame:
         screen.blit(text, text_rect)
 
         score_instance = Score.PlayerScore(self.screen)
-        score_text = get_font(30, ind).render("Score: " + str(score_instance.get_score()), True, (255, 255, 255))
+        score_text = get_font(30, ind).render("Score: " + str(self.score.get_score()), True, (255, 255, 255))
         score_rect = score_text.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) - (160 * ind)))
         screen.blit(score_text, score_rect)
 
@@ -183,5 +178,5 @@ class PacManGame:
 
     def back_to_menu(self):
         from menu_pg.Menu import Menu
-        menu = Menu()
+        menu = Menu(self.screen_settings)
         menu.start()
