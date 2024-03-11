@@ -15,7 +15,6 @@ class Health:
     def decrease_health(self):
         self.__health -= 1
         if self.__health <= 0:
-            print("Game over")
             self.game_instance.show_game_over()
         else:
             print("restart")
