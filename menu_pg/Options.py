@@ -1,5 +1,4 @@
 import pygame
-from win32api import GetSystemMetrics
 
 
 def get_font(size, ind):
@@ -7,25 +6,10 @@ def get_font(size, ind):
 
 
 class Options:
-    SCREEN_SIZES = {
-        "Small": (GetSystemMetrics(1) // 2, GetSystemMetrics(1) * 0.95 // 2),
-        "Medium": (GetSystemMetrics(1) // 1.5, GetSystemMetrics(1) * 0.95 // 1.5),
-        "Large": (GetSystemMetrics(1) - 70, (GetSystemMetrics(1) - 70) * 0.95)
-    }
-    BACKGROUND_COLORS = {
-        "Black": (0, 0, 0),
-        "Blue": (97, 146, 178),
-        "Brown": (77, 33, 34),
-        "Pink": (200, 7, 111)
-    }
     FPS = 60
 
-    def __init__(self):
-        self.current_screen_size = "Large"
-        self.current_background_color = "Black"
-        self.background_image = None
-        self.image_inserted = False
-        self.HEIGHT, self.WIDTH = self.SCREEN_SIZES[self.current_screen_size]
+    def __init__(self, screen_settings):
+        self.screen_settings = screen_settings
         self.back_rect = None
         self.insert_rect = None
         self.option_rects = None
@@ -35,20 +19,20 @@ class Options:
 
     def start(self):
         pygame.init()
-        timer = pygame.time.Clock()
+        clock = pygame.time.Clock()
 
-        self.HEIGHT, self.WIDTH = self.SCREEN_SIZES[self.current_screen_size]
+        screen_size = self.screen_settings.get_screen_size()
+        self.HEIGHT, self.WIDTH = self.screen_settings.SCREEN_SIZES[screen_size]
         screen = pygame.display.set_mode([self.WIDTH, self.HEIGHT])
 
         running = True
-
         while running:
-            timer.tick(self.FPS)
-            background_color = self.get_current_background_color()
+            clock.tick(self.FPS)
+            background_color = self.screen_settings.get_background_color()
             screen.fill(background_color)
 
-            if self.image_inserted:
-                screen.blit(self.background_image, (0, 0))
+            if self.screen_settings.is_image_inserted():
+                screen.blit(self.screen_settings.get_background_image(), (0, 0))
 
             self.draw_options_screen(screen)
 
@@ -59,36 +43,37 @@ class Options:
                     mouse_pos = pygame.mouse.get_pos()
                     for option_rect, option in zip(self.option_rects, self.options):
                         if option_rect.collidepoint(mouse_pos):
-                            self.set_screen_size(option)
-                            self.current_screen_size = option
+                            self.screen_settings.set_screen_size(option)
+                            screen_size = self.screen_settings.get_screen_size()
+                            self.HEIGHT, self.WIDTH = self.screen_settings.SCREEN_SIZES[screen_size]
                             screen = pygame.display.set_mode([self.WIDTH, self.HEIGHT])
                     for color_rect, color in zip(self.col_option_rects, self.col_options):
                         if color_rect.collidepoint(mouse_pos):
-                            self.current_background_color = color
-                            screen.fill(self.BACKGROUND_COLORS[color])
-                            self.image_inserted = False
+                            self.screen_settings.set_background_color(color)
+                            screen.fill(self.screen_settings.get_background_color())
+                            self.screen_settings.set_image_inserted(False)
                     if self.insert_rect.collidepoint(mouse_pos):
-                        self.image_inserted = True
-                    if self.image_inserted:
-                        self.insert_image()
+                        self.screen_settings.set_image_inserted(True)
+                    if self.screen_settings.is_image_inserted():
+                        self.screen_settings.set_background_image(self.insert_image())
                     if self.back_rect.collidepoint(mouse_pos):
-                        return
+                        self.back_to_menu()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        return
+                        self.back_to_menu()
 
             self.draw_options_screen(screen)
             pygame.display.flip()
 
         pygame.quit()
-        return self.WIDTH, self.HEIGHT, self.get_current_background_color, self.image_inserted
 
     def draw_options_screen(self, screen):
-        if self.current_screen_size == "Large":
+        screen_size = self.screen_settings.get_screen_size()
+        if screen_size == "Large":
             ind = 1
-        elif self.current_screen_size == "Medium":
+        elif screen_size == "Medium":
             ind = 0.7
-        elif self.current_screen_size == "Small":
+        elif screen_size == "Small":
             ind = 0.5
 
         back_text = get_font(20, ind).render("Back to Menu", True, (255, 255, 255))
@@ -151,21 +136,11 @@ class Options:
                 color_text = get_font(25, ind).render(color_text, True, (255, 242, 204))
                 screen.blit(color_text, color_rect)
 
-    def set_screen_size(self, option):
-        self.HEIGHT, self.WIDTH = self.SCREEN_SIZES[option]
-
-    def get_current_screen_size(self):
-        return self.current_screen_size
-
-    def get_current_background_color(self):
-        return self.BACKGROUND_COLORS[self.current_background_color]
-
-    def get_background_image(self):
-        return self.background_image
-
-    def is_image_inserted(self):
-        return self.image_inserted
-
     def insert_image(self):
-        self.background_image = pygame.image.load("assets/cute.png").convert()
-        self.background_image = pygame.transform.scale(self.background_image, (self.WIDTH, self.HEIGHT))
+        background_image = pygame.image.load("assets/cute.png").convert()
+        return pygame.transform.scale(background_image, (self.WIDTH, self.HEIGHT))
+
+    def back_to_menu(self):
+        from menu_pg.Menu import Menu
+        menu = Menu(self.screen_settings)
+        menu.start()
