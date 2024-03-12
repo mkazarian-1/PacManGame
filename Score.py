@@ -12,7 +12,7 @@ class PlayerScore:
     def increase_score(self, value):
         self.__score += value
 
-    def clera_score(self):
+    def clear_score(self):
         self.__score = 0
 
     def draw(self, width, height):
