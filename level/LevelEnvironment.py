@@ -47,14 +47,13 @@ class Food(IDrawAble, IActionable):
 
 
 class Energiser(IDrawAble, IActionable):
-    def __init__(self, screen, x, y, cell_width, cell_height, level_loop_counter, color,
+    def __init__(self, screen, x, y, cell_width, cell_height, color,
                  end_game_controller: EndGameController):
         self.screen = screen
         self.x = x
         self.y = y
         self.cell_width = cell_width
         self.cell_height = cell_height
-        self.level_loop_counter = level_loop_counter
         self.color = color
         self.end_game_controller = end_game_controller
         self.end_game_controller.increase_amount_dots(1)
@@ -63,7 +62,7 @@ class Energiser(IDrawAble, IActionable):
         self.end_game_controller.decrease_amount_dots(1)
 
     def draw(self):
-        if self.level_loop_counter.get() > 10:
+        if pygame.time.get_ticks() % 400 > 200:
             pygame.draw.circle(self.screen, self.color,
                                (self.x * self.cell_width + (self.cell_width / 2),
                                 self.y * self.cell_height + (self.cell_height / 2)), 8)

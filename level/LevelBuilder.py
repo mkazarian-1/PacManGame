@@ -9,12 +9,11 @@ from level.EndGameController import EndGameController
 class LevelBuilder:
     level_color = "blue"
 
-    def __init__(self, screen: pygame.surface.Surface, level_map, level_loop_counter, score: Score.PlayerScore):
+    def __init__(self, screen: pygame.surface.Surface, level_map, score: Score.PlayerScore):
         self.screen = screen
         self.width = screen.get_width()
         self.height = screen.get_height()
         self.level_map = level_map
-        self.level_loop_counter = level_loop_counter
         self.cell_height = self.height / len(self.level_map)
         self.cell_width = self.width / len(self.level_map[0])
         self.score = score
@@ -35,7 +34,7 @@ class LevelBuilder:
                 elif self.level_map[y][x] == 2:
                     level_environment[y][x] = (LevelEnvironment
                                                .Energiser(self.screen, x, y, self.cell_width, self.cell_height,
-                                                          self.level_loop_counter, "white", self.end_game_controller))
+                                                          "white", self.end_game_controller))
                 elif self.level_map[y][x] == 3:
                     level_environment[y][x] = (LevelEnvironment
                                                .Wall(self.screen, x, y, self.cell_width, self.cell_height, 1,
