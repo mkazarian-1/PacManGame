@@ -48,7 +48,7 @@ class PacManGame:
         level_loop_counter = LevelLoopCounter()
 
         self.score = Score.PlayerScore(level_bar_surface)
-        health = Health(level_bar_surface, self)
+        health = Health(level_bar_surface, self.show_game_over)
 
         level_bar = LevelBar(level_bar_surface, self.score, health)
 
@@ -111,6 +111,8 @@ class PacManGame:
                         pacman.set_turn_up()
                     elif event.key == pygame.K_DOWN:
                         pacman.set_turn_down()
+                    elif event.key == pygame.K_SPACE:
+                        health.decrease_health()
                     elif event.key == pygame.K_ESCAPE:
                         self.back_to_menu()
 
