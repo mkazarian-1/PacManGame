@@ -357,7 +357,9 @@ class Ghost(IObserver, ABC):
 
     def _is_cell_wall(self, cell):
         if (self.is_in_box or self._is_ghost_dead) and type(cell) is LevelEnvironment.Door\
-                and self.ghost_start_game_counter.get() == 250:
+                and ((self.ghost_start_game_counter.get() >= 120 and type(self) is PinkGhost)
+                     or (self.ghost_start_game_counter.get() >= 250 and type(self) is BlueGhost) or
+                     (self.ghost_start_game_counter.get() == 500 and type(self) is OrangeGhost)):
             return False
         return issubclass(type(cell), LevelEnvironment.IWallAble)
 

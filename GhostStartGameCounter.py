@@ -5,7 +5,7 @@ class GhostStartGameCounter:
         return self.time_counter
 
     def increase(self):
-        if self.time_counter > 250:
-            self.time_counter = 250
+        if self.time_counter > 500:
+            self.time_counter = 500
         else:
             self.time_counter += 1

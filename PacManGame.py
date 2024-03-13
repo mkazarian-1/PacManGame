@@ -116,10 +116,10 @@ class PacManGame(IObserver):
                 self.running = False
 
             self.level_controller.update()
+
             ghost_start_game_counter.increase()
 
-            if ghost_start_game_counter.get() == 250:
-                mode_counter.increase()
+            mode_counter.increase()
 
             level_bar.update()
             pacman.update_position()
