@@ -19,6 +19,7 @@ class ScreenSettings:
             "Pink": (200, 7, 111)
         }
 
+
     def set_screen_size(self, size):
         if size in self.SCREEN_SIZES:
             self.current_screen_size = size
@@ -44,3 +45,11 @@ class ScreenSettings:
 
     def is_image_inserted(self):
         return self.image_inserted
+
+    def get_ind(self):
+        if self.current_screen_size == "Large":
+            return 1
+        elif self.current_screen_size == "Medium":
+            return 0.7
+        elif self.current_screen_size == "Small":
+            return 0.5

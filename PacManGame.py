@@ -1,13 +1,12 @@
 import pygame
 
 import Score
+from EndGameScreen import EndGameScreen
 from Health import Health
 from Observer import IObserver
 from level import LevelMap
-from win32api import GetSystemMetrics
 from level.EndGameController import EndGameController
 from level.LevelBuilder import LevelBuilder, LevelBar
-from menu_pg.Options import Options
 from PacMan import PacMan
 from EnemiesCreator import RedGhost, OrangeGhost, PinkGhost, BlueGhost
 
@@ -28,7 +27,6 @@ class PacManGame(IObserver):
 
     def __init__(self, screen_settings):
         self.screen_settings = screen_settings
-        self.options = Options(self.screen_settings)
         self.current_screen_size = self.screen_settings.get_screen_size()
         self.background = self.screen_settings.get_background_color()
         self.image_inserted = self.screen_settings.is_image_inserted()
@@ -62,9 +60,11 @@ class PacManGame(IObserver):
             self.level_start()
 
         if self.endGameController.is_win():
-            print("You win!!!")
+            game_over_screen = EndGameScreen(self.screen_settings, self.score.get_score(), True)
+            game_over_screen.show_game_over()
         else:
-            print("Game over")
+            game_over_screen = EndGameScreen(self.screen_settings, self.score.get_score(), False)
+            game_over_screen.show_game_over()
 
     def level_start(self):
         pygame.init()
@@ -137,65 +137,6 @@ class PacManGame(IObserver):
                         self.back_to_menu()
 
             pygame.display.flip()
-
-    def show_game_over(self):
-        clock = pygame.time.Clock()
-        screen = self.screen
-        self.draw_end(screen)
-
-        running = True
-        while running:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    menu_mouse_pos = pygame.mouse.get_pos()
-                    if self.play_rect.collidepoint(menu_mouse_pos):
-                        self.start_game()
-                    if self.menu_rect.collidepoint(menu_mouse_pos):
-                        self.back_to_menu()
-            self.draw_end(screen)
-            pygame.display.flip()
-            clock.tick(60)
-        pygame.quit()
-
-    def draw_end(self, screen):
-        if self.current_screen_size == "Large":
-            ind = 1
-        elif self.current_screen_size == "Medium":
-            ind = 0.7
-        elif self.current_screen_size == "Small":
-            ind = 0.5
-
-        overlay = pygame.Surface(screen.get_size())
-        overlay.set_alpha(10)
-        overlay.fill((0, 0, 0))
-        screen.blit(overlay, (0, 0))
-
-        text = get_font(65, ind).render("Game Over", True, (255, 0, 0))
-        text_rect = text.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) - (250 * ind)))
-        screen.blit(text, text_rect)
-
-        score_instance = Score.PlayerScore(self.screen)
-        score_text = get_font(30, ind).render("Score: " + str(self.score.get_score()), True, (255, 255, 255))
-        score_rect = score_text.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) - (160 * ind)))
-        screen.blit(score_text, score_rect)
-
-        play_button = get_font(55, ind).render("Restart", True, (255, 255, 255))
-        self.play_rect = play_button.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) - (35 * ind)))
-        self.screen.blit(play_button, self.play_rect)
-
-        if self.play_rect.collidepoint(pygame.mouse.get_pos()):
-            play_button = get_font(55, ind).render("Restart", True, (255, 242, 204))
-            self.screen.blit(play_button, self.play_rect)
-
-        menu_button = get_font(55, ind).render("Back to menu", True, (255, 255, 255))
-        self.menu_rect = menu_button.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2 + (105 * ind)))
-        self.screen.blit(menu_button, self.menu_rect)
-
-        if self.menu_rect.collidepoint(pygame.mouse.get_pos()):
-            menu_button = get_font(55, ind).render("Back to menu", True, (255, 242, 204))
-            self.screen.blit(menu_button, self.menu_rect)
 
     def back_to_menu(self):
         from menu_pg.Menu import Menu
