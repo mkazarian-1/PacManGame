@@ -12,6 +12,7 @@ from PacMan import PacMan
 from EnemiesCreator import RedGhost, OrangeGhost, PinkGhost, BlueGhost
 
 from Mode_Counter import ModeCounter
+from GhostStartGameCounter import GhostStartGameCounter
 
 
 def get_font(size, ind):
@@ -73,6 +74,8 @@ class PacManGame(IObserver):
 
         mode_counter = ModeCounter()
 
+        ghost_start_game_counter = GhostStartGameCounter()
+
         level_bar = LevelBar(self.level_bar_surface, self.score, self.health)
 
         cell_len_x, cell_len_y = self.level_controller.get_amount_of_cells()
@@ -81,18 +84,18 @@ class PacManGame(IObserver):
 
         red_ghost = RedGhost(self.level_surface, self.level_controller, self.health, pacman,
                              self.RED_GHOST_CELL_COORDINATE,
-                             [cell_len_x, 0], mode_counter, self.score)
+                             [cell_len_x, 0], mode_counter, self.score, ghost_start_game_counter)
 
         blue_ghost = BlueGhost(self.level_surface, self.level_controller, self.health, pacman,
                                self.BLUE_GHOST_CELL_COORDINATE,
-                               [cell_len_x, cell_len_y], red_ghost, mode_counter, self.score)
+                               [cell_len_x, cell_len_y], red_ghost, mode_counter, self.score, ghost_start_game_counter)
 
         pink_ghost = PinkGhost(self.level_surface, self.level_controller, self.health, pacman,
                                self.PINK_GHOST_CELL_COORDINATE,
-                               [0, 0], mode_counter, self.score)
+                               [0, 0], mode_counter, self.score, ghost_start_game_counter)
         orange_ghost = OrangeGhost(self.level_surface, self.level_controller, self.health, pacman,
                                    self.ORANGE_GHOST_CELL_COORDINATE,
-                                   [0, cell_len_y], mode_counter, self.score)
+                                   [0, cell_len_y], mode_counter, self.score, ghost_start_game_counter)
 
         ghosts = [red_ghost, blue_ghost, pink_ghost, orange_ghost]
 
@@ -113,7 +116,11 @@ class PacManGame(IObserver):
                 self.running = False
 
             self.level_controller.update()
-            mode_counter.increase()
+            ghost_start_game_counter.increase()
+
+            if ghost_start_game_counter.get() == 250:
+                mode_counter.increase()
+
             level_bar.update()
             pacman.update_position()
 

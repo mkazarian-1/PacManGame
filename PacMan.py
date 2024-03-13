@@ -7,7 +7,7 @@ from enum import Enum, auto
 
 
 class PacMan (Observable):
-    PACMAN_SPEED = 4
+    PACMAN_SPEED = 2.5
 
     def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController):
 
@@ -255,7 +255,7 @@ class PacMan (Observable):
 
     def get_pacman_rect(self):
         pacman_rect = pygame.rect.Rect(
-            (self.pacman_center_x - self.pacman_width // 2, self.pacman_center_y - self.pacman_height // 2),
-            (self.pacman_width, self.pacman_height))
+            (self.pacman_center_x - self.pacman_width // 5, self.pacman_center_y - self.pacman_height // 5),
+            (self.pacman_width//2, self.pacman_height//2))
         return pacman_rect
 
