@@ -14,6 +14,7 @@ class Menu:
         self.play_rect = None
         self.options_rect = None
         self.quit_rect = None
+        self.ind = screen_settings.get_ind()
 
     def start(self):
         pygame.display.set_caption("PacMan")
@@ -50,40 +51,33 @@ class Menu:
         pygame.quit()
 
     def draw_menu(self, screen):
-        screen_size = self.screen_settings.get_screen_size()
-        if screen_size == "Large":
-            ind = 1
-        elif screen_size == "Medium":
-            ind = 0.7
-        elif screen_size == "Small":
-            ind = 0.5
 
-        menu_text = get_font(65, ind).render("MAIN MENU", True, "#f4cd33")
-        menu_rect = menu_text.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) - (300 * ind)))
+        menu_text = get_font(65, self.ind).render("MAIN MENU", True, "#f4cd33")
+        menu_rect = menu_text.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) - (300 * self.ind)))
         screen.blit(menu_text, menu_rect)
 
-        play_button = get_font(65, ind).render("PLAY", True, (255, 255, 255))
-        self.play_rect = play_button.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) - (150 * ind)))
+        play_button = get_font(65, self.ind).render("PLAY", True, (255, 255, 255))
+        self.play_rect = play_button.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) - (150 * self.ind)))
         screen.blit(play_button, self.play_rect)
 
         if self.play_rect.collidepoint(pygame.mouse.get_pos()):
-            play_button = get_font(65, ind).render("PLAY", True, (255, 242, 204))
+            play_button = get_font(65, self.ind).render("PLAY", True, (255, 242, 204))
             screen.blit(play_button, self.play_rect)
 
-        options_button = get_font(65, ind).render("OPTIONS", True, (255, 255, 255))
+        options_button = get_font(65, self.ind).render("OPTIONS", True, (255, 255, 255))
         self.options_rect = options_button.get_rect(center=(self.WIDTH // 2, self.HEIGHT // 2))
         screen.blit(options_button, self.options_rect)
 
         if self.options_rect.collidepoint(pygame.mouse.get_pos()):
-            options_button = get_font(65, ind).render("OPTIONS", True, (255, 242, 204))
+            options_button = get_font(65, self.ind).render("OPTIONS", True, (255, 242, 204))
             screen.blit(options_button, self.options_rect)
 
-        quit_button = get_font(65, ind).render("QUIT", True, (255, 255, 255))
-        self.quit_rect = quit_button.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) + (150 * ind)))
+        quit_button = get_font(65, self.ind).render("QUIT", True, (255, 255, 255))
+        self.quit_rect = quit_button.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) + (150 * self.ind)))
         screen.blit(quit_button, self.quit_rect)
 
         if self.quit_rect.collidepoint(pygame.mouse.get_pos()):
-            quit_button = get_font(65, ind).render("QUIT", True, (255, 242, 204))
+            quit_button = get_font(65, self.ind).render("QUIT", True, (255, 242, 204))
             screen.blit(quit_button, self.quit_rect)
 
     def option(self):
