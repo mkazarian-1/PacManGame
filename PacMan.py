@@ -2,22 +2,20 @@ import pygame
 
 from Observer import Observable
 from Position import Position
-from level import LevelBuilder, LevelEnvironment, LevelLoopCounter
+from level import LevelBuilder, LevelEnvironment
 from enum import Enum, auto
 
 
 class PacMan (Observable):
     PACMAN_SPEED = 2.5
 
-    def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
-                 level_loop_counter: LevelLoopCounter.LevelLoopCounter):
+    def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController):
 
         super().__init__()
         self.screen = screen
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
         self.level_controller = level_controller
-        self.level_loop_counter = level_loop_counter
 
         self.cell_len_x, self.cell_len_y = level_controller.get_amount_of_cells()
 
@@ -76,7 +74,10 @@ class PacMan (Observable):
         pacman_x = self.pacman_center_x - self.pacman_width / 2
         pacman_y = self.pacman_center_y - self.pacman_height / 2
 
-        image_index = self.level_loop_counter.get() // 6
+        current_time = pygame.time.get_ticks()
+
+        image_index = int((current_time % 400) * 0.01)
+
         if 0 <= image_index < len(self.pacman_images):
             if self.direction == Position.RIGHT:
                 self.screen.blit(pygame.transform.rotate(self.pacman_images[image_index], 0),

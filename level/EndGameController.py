@@ -1,10 +1,14 @@
 class EndGameController:
-    dots = 0
+    __dots = 0
+    __is_win = False
 
     def increase_amount_dots(self, amount: int):
-        self.dots += amount
+        self.__dots += amount
 
     def decrease_amount_dots(self, amount: int):
-        self.dots -= amount
-        if self.dots <= 0:
-            print("You WIN !!!!")
+        self.__dots -= amount
+        if self.__dots <= 0:
+            self.__is_win = True
+
+    def is_win(self):
+        return self.__is_win

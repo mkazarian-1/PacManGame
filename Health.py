@@ -1,9 +1,12 @@
 import pygame
 
+from Observer import Observable
 
-class Health:
+
+class Health(Observable):
     BASE_HEALTH = 3
     IMAGE_PASS = "characters/pacman_images/1.png"
+
 
     def __init__(self, screen: pygame.surface.Surface, show_game_over_callback):
         self.__screen = screen
@@ -12,10 +15,10 @@ class Health:
 
     def decrease_health(self):
         self.__health -= 1
-        if self.__health <= 0:
-            self.show_game_over_callback()
-        else:
-            print("restart")
+        self.notify_observers("decrease_health")
+
+    def is_alive(self):
+        return self.__health > 0
 
     def draw(self, width, height):
         image = pygame.image.load(self.IMAGE_PASS)

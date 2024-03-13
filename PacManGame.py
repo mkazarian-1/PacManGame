@@ -2,9 +2,11 @@ import pygame
 
 import Score
 from Health import Health
+from Observer import IObserver
 from level import LevelMap
+from win32api import GetSystemMetrics
+from level.EndGameController import EndGameController
 from level.LevelBuilder import LevelBuilder, LevelBar
-from level.LevelLoopCounter import LevelLoopCounter
 from menu_pg.Options import Options
 from PacMan import PacMan
 from EnemiesCreator import RedGhost, OrangeGhost, PinkGhost, BlueGhost
@@ -16,7 +18,7 @@ def get_font(size, ind):
     return pygame.font.Font("assets/Emulogic-zrEw.ttf", int(size * ind))
 
 
-class PacManGame:
+class PacManGame(IObserver):
     pygame.init()
     FPS = 60
     RED_GHOST_CELL_COORDINATE = [12, 12]
@@ -34,69 +36,86 @@ class PacManGame:
         self.play_rect = None
         self.menu_rect = None
 
+        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        self.level_surface = pygame.Surface((self.screen.get_width(), self.screen.get_height() - 50))
+        self.level_bar_surface = pygame.Surface(
+            (self.screen.get_width(), self.screen.get_height() - self.level_surface.get_height()))
+
+        self.score = Score.PlayerScore(self.level_bar_surface)
+        self.health = Health(self.level_bar_surface)
+        self.health.add_observer(self)
+
+        self.endGameController = EndGameController()
+        self.level_controller = LevelBuilder(self.level_surface, LevelMap.boards,
+                                             self.score, self.endGameController).build()
+        self.running = True
+
     def set_screen_size(self):
         self.HEIGHT, self.WIDTH = self.screen_settings.SCREEN_SIZES[self.current_screen_size]
 
+    def update_observer(self, event):
+        self.running = False
+
     def start_game(self):
-        pygame.init()
         self.set_screen_size()
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
+        
+        while self.health.is_alive() and not self.endGameController.is_win():
+            self.level_start()
 
-        level_surface = pygame.Surface((self.screen.get_width(), self.screen.get_height() - 50))
-        level_bar_surface = pygame.Surface(
-            (self.screen.get_width(), self.screen.get_height() - level_surface.get_height()))
+        if self.endGameController.is_win():
+            print("You win!!!")
+        else:
+            print("Game over")
+
+    def level_start(self):
+        pygame.init()
 
         clock = pygame.time.Clock()
-        level_loop_counter = LevelLoopCounter()
 
         mode_counter = ModeCounter()
 
-        score = Score.PlayerScore(level_bar_surface)
-        health = Health(level_bar_surface, self.show_game_over)
+        level_bar = LevelBar(self.level_bar_surface, self.score, self.health)
 
-        level_bar = LevelBar(level_bar_surface, self.score, health)
+        cell_len_x, cell_len_y = self.level_controller.get_amount_of_cells()
 
-        level_controller = LevelBuilder(level_surface, LevelMap.boards,
-                                        level_loop_counter, self.score).build()
+        pacman = PacMan(self.level_surface, self.level_controller)
 
-        cell_len_x, cell_len_y = level_controller.get_amount_of_cells()
-
-        pacman = PacMan(level_surface, level_controller, level_loop_counter)
-
-        red_ghost = RedGhost(level_surface, level_controller, health, pacman,
+        red_ghost = RedGhost(self.level_surface, self.level_controller, self.health, pacman,
                              self.RED_GHOST_CELL_COORDINATE,
-                             [cell_len_x, 0], mode_counter, score)
+                             [cell_len_x, 0], mode_counter, self.score)
 
-        blue_ghost = BlueGhost(level_surface, level_controller, health, pacman,
+        blue_ghost = BlueGhost(self.level_surface, self.level_controller, self.health, pacman,
                                self.BLUE_GHOST_CELL_COORDINATE,
-                               [cell_len_x, cell_len_y], red_ghost, mode_counter, score)
+                               [cell_len_x, cell_len_y], red_ghost, mode_counter, self.score)
 
-        pink_ghost = PinkGhost(level_surface, level_controller, health, pacman,
+        pink_ghost = PinkGhost(self.level_surface, self.level_controller, self.health, pacman,
                                self.PINK_GHOST_CELL_COORDINATE,
-                               [0, 0],  mode_counter, score)
-        orange_ghost = OrangeGhost(level_surface, level_controller, health, pacman,
+                               [0, 0], mode_counter, self.score)
+        orange_ghost = OrangeGhost(self.level_surface, self.level_controller, self.health, pacman,
                                    self.ORANGE_GHOST_CELL_COORDINATE,
-                                   [0, cell_len_y], mode_counter, score)
+                                   [0, cell_len_y], mode_counter, self.score)
 
         ghosts = [red_ghost, blue_ghost, pink_ghost, orange_ghost]
 
-        running = True
+        self.running = True
 
-        while running:
+        while self.running:
             clock.tick(self.FPS)
 
-            self.screen.blit(level_surface, (0, 0))
-            self.screen.blit(level_bar_surface, (0, level_surface.get_height()))
+            self.screen.blit(self.level_surface, (0, 0))
+            self.screen.blit(self.level_bar_surface, (0, self.level_surface.get_height()))
 
-            level_surface.fill(self.background)
-            level_bar_surface.fill(self.background)
+            self.level_surface.fill(self.background)
+            self.level_bar_surface.fill(self.background)
+            if self.ins:
+                self.level_surface.blit(self.background_image, (0, 0))
 
-            if self.image_inserted:
-                level_surface.blit(self.background_image, (0, 0))
+            if self.endGameController.is_win():
+                self.running = False
 
-            level_loop_counter.increase()
+            self.level_controller.update()
             mode_counter.increase()
-            level_controller.update()
             level_bar.update()
             pacman.update_position()
 
@@ -105,7 +124,7 @@ class PacManGame:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    pygame.quit()
 
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RIGHT:
@@ -122,7 +141,6 @@ class PacManGame:
                         self.back_to_menu()
 
             pygame.display.flip()
-        pygame.quit()
 
     def show_game_over(self):
         clock = pygame.time.Clock()
