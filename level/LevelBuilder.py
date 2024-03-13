@@ -9,7 +9,8 @@ from level.EndGameController import EndGameController
 class LevelBuilder:
     level_color = "blue"
 
-    def __init__(self, screen: pygame.surface.Surface, level_map, score: Score.PlayerScore):
+    def __init__(self, screen: pygame.surface.Surface, level_map, score: Score.PlayerScore,
+                 end_game_controller: EndGameController):
         self.screen = screen
         self.width = screen.get_width()
         self.height = screen.get_height()
@@ -17,7 +18,7 @@ class LevelBuilder:
         self.cell_height = self.height / len(self.level_map)
         self.cell_width = self.width / len(self.level_map[0])
         self.score = score
-        self.end_game_controller = EndGameController()
+        self.end_game_controller = end_game_controller
 
     def build(self):
 
