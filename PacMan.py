@@ -7,7 +7,7 @@ from enum import Enum, auto
 
 
 class PacMan (Observable):
-    PACMAN_SPEED = 2.5
+    PACMAN_SPEED = 4
 
     def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController):
 

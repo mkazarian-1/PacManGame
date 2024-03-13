@@ -7,11 +7,10 @@ class Health(Observable):
     BASE_HEALTH = 3
     IMAGE_PASS = "characters/pacman_images/1.png"
 
-
-    def __init__(self, screen: pygame.surface.Surface, show_game_over_callback):
+    def __init__(self, screen: pygame.surface.Surface):
+        super().__init__()
         self.__screen = screen
         self.__health = self.BASE_HEALTH
-        self.show_game_over_callback = show_game_over_callback
 
     def decrease_health(self):
         self.__health -= 1

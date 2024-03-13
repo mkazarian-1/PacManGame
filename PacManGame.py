@@ -36,6 +36,7 @@ class PacManGame(IObserver):
         self.play_rect = None
         self.menu_rect = None
 
+        self.set_screen_size()
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
         self.level_surface = pygame.Surface((self.screen.get_width(), self.screen.get_height() - 50))
         self.level_bar_surface = pygame.Surface(
@@ -57,9 +58,6 @@ class PacManGame(IObserver):
         self.running = False
 
     def start_game(self):
-        self.set_screen_size()
-        self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT))
-        
         while self.health.is_alive() and not self.endGameController.is_win():
             self.level_start()
 
@@ -108,7 +106,7 @@ class PacManGame(IObserver):
 
             self.level_surface.fill(self.background)
             self.level_bar_surface.fill(self.background)
-            if self.ins:
+            if self.image_inserted:
                 self.level_surface.blit(self.background_image, (0, 0))
 
             if self.endGameController.is_win():
@@ -135,8 +133,6 @@ class PacManGame(IObserver):
                         pacman.set_turn_up()
                     elif event.key == pygame.K_DOWN:
                         pacman.set_turn_down()
-                    elif event.key == pygame.K_SPACE:
-                        health.decrease_health()
                     elif event.key == pygame.K_ESCAPE:
                         self.back_to_menu()
 
