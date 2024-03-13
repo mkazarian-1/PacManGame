@@ -43,7 +43,6 @@ class EndGameScreen:
 
     def draw_end(self, screen):
         overlay = pygame.Surface(screen.get_size())
-        overlay.set_alpha(10)
         overlay.fill((0, 0, 0))
         screen.blit(overlay, (0, 0))
 
