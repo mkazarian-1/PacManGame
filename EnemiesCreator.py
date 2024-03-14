@@ -5,9 +5,6 @@ from abc import ABC, abstractmethod
 from enum import Enum, auto
 
 import Health
-import Mode_Counter
-import GhostStartGameCounter
-import Score
 from Observer import IObserver
 from Position import Position
 from level import LevelBuilder, LevelEnvironment
@@ -39,7 +36,7 @@ class Ghost(IObserver, ABC):
 
     def __init__(self, screen: pygame.surface.Surface,
                  level_controller: LevelBuilder.LevelController, player_health: Health.Health, pacman: PacMan,
-                 ghost_cell_coordinates, ghost_base_goal, mode_counter, score, ghost_start_game_counter):
+                 ghost_cell_coordinates, ghost_base_goal, mode_counter, score):
         self.screen = screen
         self.screen_width = screen.get_width()
         self.screen_height = screen.get_height()
@@ -69,11 +66,9 @@ class Ghost(IObserver, ABC):
         self.rotation_allow = True
         self.is_in_box = True
 
+        self.start_timer = pygame.time.get_ticks()
         # 0-Right 1-Left 2-Up 3-Down
         self.turn_allow = self._turn_allow_update(self.ghost_cell_x, self.ghost_cell_y)
-
-        self.start_timer = pygame.time.get_ticks()
-        self.mode_durations = [7000, 20000]
 
         self.mode_index = 0
         self.mode_durations = [
@@ -98,7 +93,6 @@ class Ghost(IObserver, ABC):
         self.is_run = True
 
         self.mode_counter = mode_counter
-        self.ghost_start_game_counter = ghost_start_game_counter
         self.score = score
 
         self._is_make_opposite_access = False
@@ -173,7 +167,6 @@ class Ghost(IObserver, ABC):
             self.ghost_goal = copy.deepcopy(self.OUT_OF_BOX_GOAL)
             if self.ghost_cell_x == self.ghost_goal[0] and self.ghost_cell_y == self.ghost_goal[1]:
                 self.is_in_box = False
-                # self.mode_index = 0
             return
 
         if self._is_ghost_dead:
@@ -356,10 +349,9 @@ class Ghost(IObserver, ABC):
                 not self._is_cell_wall(self.level_controller.get_cell(cell_x, cell_y + 1))]
 
     def _is_cell_wall(self, cell):
-        if (self.is_in_box or self._is_ghost_dead) and type(cell) is LevelEnvironment.Door\
-                and ((self.ghost_start_game_counter.get() >= 120 and type(self) is PinkGhost)
-                     or (self.ghost_start_game_counter.get() >= 250 and type(self) is BlueGhost) or
-                     (self.ghost_start_game_counter.get() == 500 and type(self) is OrangeGhost)):
+        current_time = pygame.time.get_ticks()
+
+        if (self.is_in_box or self._is_ghost_dead) and (type(cell) is LevelEnvironment.Door) and (self._get_delay_time() < (current_time - self.start_timer)):
             return False
         return issubclass(type(cell), LevelEnvironment.IWallAble)
 
@@ -370,6 +362,10 @@ class Ghost(IObserver, ABC):
 
     @abstractmethod
     def _get_angry_goal(self):
+        pass
+
+    @abstractmethod
+    def _get_delay_time(self):
         pass
 
     @abstractmethod
@@ -386,8 +382,8 @@ class Ghost(IObserver, ABC):
 
     def get_ghost_rect(self):
         ghost_rect = pygame.rect.Rect(
-            (self.ghost_center_x - self.ghost_width//5, self.ghost_center_y - self.ghost_height//6),
-            (self.ghost_width//2, self.ghost_height//2))
+            (self.ghost_center_x - self.ghost_width // 5, self.ghost_center_y - self.ghost_height // 6),
+            (self.ghost_width // 2, self.ghost_height // 2))
 
         return ghost_rect
 
@@ -417,6 +413,7 @@ class Ghost(IObserver, ABC):
 
 class RedGhost(Ghost):
     IMAGE_PASS_RED = 'ghosts/red.png'
+    DELAY_TIME = 0
 
     def _get_ghost_base_img_pass(self):
         return self.IMAGE_PASS_RED
@@ -424,9 +421,13 @@ class RedGhost(Ghost):
     def _get_angry_goal(self):
         return self.pacman.get_cell_coordinates()
 
+    def _get_delay_time(self):
+        return self.DELAY_TIME
+
 
 class PinkGhost(Ghost):
     IMAGE_PASS_PINK = 'ghosts/pink.png'
+    DELAY_TIME = 4000
 
     def _get_ghost_base_img_pass(self):
         return self.IMAGE_PASS_PINK
@@ -446,9 +447,13 @@ class PinkGhost(Ghost):
 
         return new_goal
 
+    def _get_delay_time(self):
+        return self.DELAY_TIME
+
 
 class OrangeGhost(Ghost):
     IMAGE_PASS_ORANGE = 'ghosts/orange.png'
+    DELAY_TIME = 12000
 
     def _get_ghost_base_img_pass(self):
         return self.IMAGE_PASS_ORANGE
@@ -460,18 +465,22 @@ class OrangeGhost(Ghost):
             return goal
         return copy.deepcopy(self.GHOST_BASE_GOAL)
 
+    def _get_delay_time(self):
+        return self.DELAY_TIME
+
 
 class BlueGhost(Ghost):
     IMAGE_PASS_BLUE = 'ghosts/blue.png'
+    DELAY_TIME = 8000
 
     def _get_ghost_base_img_pass(self):
         return self.IMAGE_PASS_BLUE
 
     def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController,
                  player_health: Health.Health, pacman: PacMan, ghost_cell_coordinates, ghost_base_goal, ghost: Ghost,
-                 mode_counter, score, ghost_start_game_counter):
+                 mode_counter, score):
         super().__init__(screen, level_controller, player_health, pacman, ghost_cell_coordinates, ghost_base_goal,
-                         mode_counter, score, ghost_start_game_counter)
+                         mode_counter, score)
         self.ghost = ghost
 
     def _get_angry_goal(self):
@@ -500,3 +509,6 @@ class BlueGhost(Ghost):
         target_y = blinky_y + 2 * vector_y
 
         return [target_x, target_y]
+
+    def _get_delay_time(self):
+        return self.DELAY_TIME
