@@ -2,8 +2,8 @@ import math
 from abc import ABC, abstractmethod
 import pygame
 
-import Score
-from level.EndGameController import EndGameController
+from src import Score
+from src.level.EndGameController import EndGameController
 
 
 class IDrawAble(ABC):

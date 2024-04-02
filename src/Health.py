@@ -1,6 +1,6 @@
 import pygame
 
-from Observer import Observable
+from src.Observer import Observable
 
 
 class Health(Observable):

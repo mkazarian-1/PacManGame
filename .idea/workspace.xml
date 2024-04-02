@@ -5,21 +5,49 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bb0cae0f-83d0-4820-83da-6b441779e503" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/PacManGame.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PacManGame.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/level/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/menu_pg/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test/test_main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EnemiesCreator.py" beforeDir="false" afterPath="$PROJECT_DIR$/EnemiesCreator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LevelBuilder.py" beforeDir="false" afterPath="$PROJECT_DIR$/LevelBuilder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LevelEnvironment.py" beforeDir="false" afterPath="$PROJECT_DIR$/LevelEnvironment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PacMan.py" beforeDir="false" afterPath="$PROJECT_DIR$/PacMan.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PacManGame.py" beforeDir="false" afterPath="$PROJECT_DIR$/PacManGame.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EndGameScreen.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/EndGameScreen.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/EnemiesCreator.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/EnemiesCreator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Health.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Health.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mode_Counter.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mode_Counter.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Observer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Observer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PacMan.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/PacMan.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PacManGame.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/PacManGame.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Position.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Position.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Score.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Score.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ScreenSettings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ScreenSettings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/level/EndGameController.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/level/EndGameController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/level/LevelBuilder.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/level/LevelBuilder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/level/LevelEnvironment.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/level/LevelEnvironment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/level/LevelMap.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/level/LevelMap.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/level/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pytest.ini" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu_pg/Menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/menu_pg/Menu.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu_pg/Options.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/menu_pg/Options.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu_pg/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/__init__.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="Game-Over-screen" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -34,23 +62,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.main.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "develop",
-    "last_opened_file_path": "D:/Py_Game_Folder/PacManGame",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Py_Game_Folder/PacManGame&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\Python_projects\PacManGame\src" />
+      <recent name="E:\Python_projects\PacManGame\src\level" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="PacManGame" />
@@ -96,6 +130,8 @@
       <workItem from="1707077718816" duration="296000" />
       <workItem from="1707317539121" duration="1106000" />
       <workItem from="1707484155476" duration="5462000" />
+      <workItem from="1712008549730" duration="654000" />
+      <workItem from="1712064629314" duration="875000" />
     </task>
     <servers />
   </component>
@@ -126,6 +162,6 @@
     </option>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/PacManGame$main.coverage" NAME="main Coverage Results" MODIFIED="1707487939651" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PacManGame$main.coverage" NAME="main Coverage Results" MODIFIED="1712064646232" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

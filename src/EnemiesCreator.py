@@ -2,15 +2,15 @@ import copy
 import math
 import random
 from abc import ABC, abstractmethod
-from enum import Enum, auto
 
-import Health
-from Observer import IObserver
-from Position import Position
-from level import LevelBuilder, LevelEnvironment
+
+from src.Observer import IObserver
+from src.Position import Position
+from src import Health
+from src.level import LevelBuilder, LevelEnvironment
 import pygame
 
-from PacMan import PacMan
+from src.PacMan import PacMan
 
 
 class GhostCount:

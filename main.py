@@ -1,5 +1,5 @@
-from menu_pg.Menu import Menu
-from ScreenSettings import ScreenSettings
+from src.menu_pg.Menu import Menu
+from src.ScreenSettings import ScreenSettings
 
 if __name__ == "__main__":
     screen_settings = ScreenSettings()

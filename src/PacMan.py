@@ -1,9 +1,8 @@
 import pygame
 
-from Observer import Observable
-from Position import Position
-from level import LevelBuilder, LevelEnvironment
-from enum import Enum, auto
+from src.Observer import Observable
+from src.Position import Position
+from src.level import LevelBuilder, LevelEnvironment
 
 
 class PacMan (Observable):

@@ -135,6 +135,6 @@ class Options:
         return pygame.transform.scale(background_image, (self.WIDTH, self.HEIGHT))
 
     def back_to_menu(self):
-        from menu_pg.Menu import Menu
+        from src.menu_pg.Menu import Menu
         menu = Menu(self.screen_settings)
         menu.start()

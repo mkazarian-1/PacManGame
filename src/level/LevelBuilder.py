@@ -1,9 +1,9 @@
 import pygame
 
-import level.LevelEnvironment as LevelEnvironment
-import Score
-from Health import Health
-from level.EndGameController import EndGameController
+import src.level.LevelEnvironment as LevelEnvironment
+from src import Score
+from src.Health import Health
+from src.level.EndGameController import EndGameController
 
 
 class LevelBuilder:

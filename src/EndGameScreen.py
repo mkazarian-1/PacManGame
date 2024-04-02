@@ -78,12 +78,12 @@ class EndGameScreen:
             screen.blit(menu_button, self.menu_rect)
 
     def back_to_menu(self):
-        from menu_pg.Menu import Menu
+        from src.menu_pg.Menu import Menu
         menu = Menu(self.screen_settings)
         menu.start()
 
     def play(self):
-        from PacManGame import PacManGame
+        from src.PacManGame import PacManGame
         pacman = PacManGame(self.screen_settings)
         pacman.start_game()
 

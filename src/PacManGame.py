@@ -1,20 +1,20 @@
 import pygame
 
-import Score
-from EndGameScreen import EndGameScreen
-from Health import Health
-from Observer import IObserver
-from level import LevelMap
-from level.EndGameController import EndGameController
-from level.LevelBuilder import LevelBuilder, LevelBar
-from PacMan import PacMan
-from EnemiesCreator import RedGhost, OrangeGhost, PinkGhost, BlueGhost
+from src import Score
+from src.EndGameScreen import EndGameScreen
+from src.Health import Health
+from src.Observer import IObserver
+from src.level import LevelMap
+from src.level.EndGameController import EndGameController
+from src.level.LevelBuilder import LevelBuilder, LevelBar
+from src.PacMan import PacMan
+from src.EnemiesCreator import RedGhost, OrangeGhost, PinkGhost, BlueGhost
 
-from Mode_Counter import ModeCounter
+from src.Mode_Counter import ModeCounter
 
 
 def get_font(size, ind):
-    return pygame.font.Font("assets/Emulogic-zrEw.ttf", int(size * ind))
+    return pygame.font.Font("../assets/Emulogic-zrEw.ttf", int(size * ind))
 
 
 class PacManGame(IObserver):
@@ -141,6 +141,6 @@ class PacManGame(IObserver):
             pygame.display.flip()
 
     def back_to_menu(self):
-        from menu_pg.Menu import Menu
+        from src.menu_pg.Menu import Menu
         menu = Menu(self.screen_settings)
         menu.start()

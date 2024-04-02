@@ -81,12 +81,12 @@ class Menu:
             screen.blit(quit_button, self.quit_rect)
 
     def option(self):
-        from menu_pg.Options import Options
+        from src.menu_pg.Options import Options
         options_screen = Options(self.screen_settings)
         options_screen.start()
 
     def play(self):
-        from PacManGame import PacManGame
+        from src.PacManGame import PacManGame
         pacman = PacManGame(self.screen_settings)
         pacman.start_game()
 
