@@ -21,50 +21,55 @@ class LevelBuilder:
         self.end_game_controller = end_game_controller
 
     def build(self):
+        level_environment = self._create_level_environment()
+        return LevelController(level_environment, self.cell_width, self.cell_height)
 
+    def _create_level_environment(self):
         level_environment = [[LevelEnvironment.BlankSpace() for _ in range(len(self.level_map[0]))]
                              for _ in range(len(self.level_map))]
-
         for y in range(len(self.level_map)):
             for x in range(len(self.level_map[0])):
+                level_environment[y][x] = self._create_environment_element(x, y)
+        return level_environment
 
-                if self.level_map[y][x] == 1:
-                    level_environment[y][x] = (LevelEnvironment
-                                               .Food(self.screen, x, y, self.cell_width, self.cell_height, "white",
-                                                     self.score, self.end_game_controller))
-                elif self.level_map[y][x] == 2:
-                    level_environment[y][x] = (LevelEnvironment
-                                               .Energiser(self.screen, x, y, self.cell_width, self.cell_height,
-                                                          "white", self.end_game_controller))
-                elif self.level_map[y][x] == 3:
-                    level_environment[y][x] = (LevelEnvironment
-                                               .Wall(self.screen, x, y, self.cell_width, self.cell_height, 1,
-                                                     self.level_color))
-                elif self.level_map[y][x] == 4:
-                    level_environment[y][x] = (LevelEnvironment
-                                               .Wall(self.screen, x, y, self.cell_width, self.cell_height, 2,
-                                                     self.level_color))
-                elif self.level_map[y][x] == 5:
-                    level_environment[y][x] = (LevelEnvironment
-                                               .CurvedWall(self.screen, x, y, self.cell_width, self.cell_height, 1,
-                                                           self.level_color))
-                elif self.level_map[y][x] == 6:
-                    level_environment[y][x] = (LevelEnvironment
-                                               .CurvedWall(self.screen, x, y, self.cell_width, self.cell_height, 2,
-                                                           self.level_color))
-                elif self.level_map[y][x] == 7:
-                    level_environment[y][x] = (LevelEnvironment
-                                               .CurvedWall(self.screen, x, y, self.cell_width, self.cell_height, 3,
-                                                           self.level_color))
-                elif self.level_map[y][x] == 8:
-                    level_environment[y][x] = (LevelEnvironment
-                                               .CurvedWall(self.screen, x, y, self.cell_width, self.cell_height, 4,
-                                                           self.level_color))
-                elif self.level_map[y][x] == 9:
-                    level_environment[y][x] = (LevelEnvironment
-                                               .Door(self.screen, x, y, self.cell_width, self.cell_height, 2, "white"))
-
-        return LevelController(level_environment, self.cell_width, self.cell_height)
+    def _create_environment_element(self, x, y):
+        element_type = self.level_map[y][x]
+        if element_type == 1:
+            return (LevelEnvironment
+                    .Food(self.screen, x, y, self.cell_width, self.cell_height, "white",
+                          self.score, self.end_game_controller))
+        elif element_type == 2:
+            return (LevelEnvironment
+                    .Energiser(self.screen, x, y, self.cell_width, self.cell_height,
+                               "white", self.end_game_controller))
+        elif element_type == 3:
+            return (LevelEnvironment
+                    .Wall(self.screen, x, y, self.cell_width, self.cell_height, 1,
+                          self.level_color))
+        elif element_type == 4:
+            return (LevelEnvironment
+                    .Wall(self.screen, x, y, self.cell_width, self.cell_height, 2,
+                          self.level_color))
+        elif element_type == 5:
+            return (LevelEnvironment
+                    .CurvedWall(self.screen, x, y, self.cell_width, self.cell_height, 1,
+                                self.level_color))
+        elif element_type == 6:
+            return (LevelEnvironment
+                    .CurvedWall(self.screen, x, y, self.cell_width, self.cell_height, 2,
+                                self.level_color))
+        elif element_type == 7:
+            return (LevelEnvironment
+                    .CurvedWall(self.screen, x, y, self.cell_width, self.cell_height, 3,
+                                self.level_color))
+        elif element_type == 8:
+            return (LevelEnvironment
+                    .CurvedWall(self.screen, x, y, self.cell_width, self.cell_height, 4,
+                                self.level_color))
+        elif element_type == 9:
+            return (LevelEnvironment
+                    .Door(self.screen, x, y, self.cell_width, self.cell_height, 2, "white"))
+        return LevelEnvironment.BlankSpace()
 
 
 class LevelController:
