@@ -5,30 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="bb0cae0f-83d0-4820-83da-6b441779e503" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/level/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/menu_pg/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/test_main.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/conftest.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_CurvedWall.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_EndGameController.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_Energiser.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_Food.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_LevelBar.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_LevelBuilder.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_LevelController.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tests/test_Wall.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/PacManGame.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PacManGame.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EndGameScreen.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/EndGameScreen.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/EnemiesCreator.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/EnemiesCreator.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Health.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Health.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mode_Counter.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Mode_Counter.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Observer.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Observer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PacMan.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/PacMan.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PacManGame.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/PacManGame.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Position.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Position.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Score.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/Score.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ScreenSettings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ScreenSettings.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/level/EndGameController.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/level/EndGameController.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/level/LevelBuilder.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/level/LevelBuilder.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/level/LevelEnvironment.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/level/LevelEnvironment.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/level/LevelMap.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/level/LevelMap.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/level/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pytest.ini" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu_pg/Menu.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/menu_pg/Menu.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu_pg/Options.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/menu_pg/Options.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu_pg/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/level/EndGameController.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/level/EndGameController.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/test_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +37,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="Game-Over-screen" />
+        <entry key="$PROJECT_DIR$" value="master" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -68,7 +60,7 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;test__LevelBuilder&quot;,
     &quot;last_opened_file_path&quot;: &quot;D:/Py_Game_Folder/PacManGame&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -79,16 +71,9 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="E:\Python_projects\PacManGame\src" />
-      <recent name="E:\Python_projects\PacManGame\src\level" />
-    </key>
-  </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python tests.Python tests for test_CurvedWall.TestCurvedWall">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="PacManGame" />
-      <option name="ENV_FILES" value="" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
@@ -109,6 +94,85 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="Python tests for test_CurvedWall.TestCurvedWall" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="PacManGame" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_CurvedWall.TestCurvedWall&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_EndGameController.TestEndGameController" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="PacManGame" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_EndGameController.TestEndGameController&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_Energiser.TestEnergiser" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="PacManGame" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_Energiser.TestEnergiser&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_Food.TestFood" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="PacManGame" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_Food.TestFood&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_LevelBar.TestLevelBar" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="PacManGame" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_LevelBar.TestLevelBar&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python tests.Python tests for test_CurvedWall.TestCurvedWall" />
+        <item itemvalue="Python tests.Python tests for test_EndGameController.TestEndGameController" />
+        <item itemvalue="Python tests.Python tests for test_Energiser.TestEnergiser" />
+        <item itemvalue="Python tests.Python tests for test_Food.TestFood" />
+        <item itemvalue="Python tests.Python tests for test_LevelBar.TestLevelBar" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -130,8 +194,6 @@
       <workItem from="1707077718816" duration="296000" />
       <workItem from="1707317539121" duration="1106000" />
       <workItem from="1707484155476" duration="5462000" />
-      <workItem from="1712008549730" duration="654000" />
-      <workItem from="1712064629314" duration="875000" />
     </task>
     <servers />
   </component>
@@ -160,8 +222,5 @@
         </entry>
       </map>
     </option>
-  </component>
-  <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/PacManGame$main.coverage" NAME="main Coverage Results" MODIFIED="1712064646232" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
