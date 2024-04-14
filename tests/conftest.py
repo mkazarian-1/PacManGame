@@ -60,7 +60,3 @@ def food(screen, level_builder, score, endgame_controller):
 @pytest.fixture
 def energiser(screen, level_builder, endgame_controller):
     return Energiser(screen, 1, 1, level_builder.cell_width, level_builder.cell_height, "white", endgame_controller)
-
-
-
-
