@@ -1,3 +1,2 @@
 def test_main():
-
-    assert 2==2
+    assert 2 == 2
