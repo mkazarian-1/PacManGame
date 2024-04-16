@@ -5,7 +5,7 @@ pygame.init()
 
 
 def get_font(size, ind):
-    return pygame.font.Font("assets/Emulogic-zrEw.ttf", int(size * ind))
+    return pygame.font.Font("../assets/Emulogic-zrEw.ttf", int(size * ind))
 
 
 class Menu:
