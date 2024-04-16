@@ -17,6 +17,8 @@ class Options:
         self.options = None
         self.col_option_rects = None
         self.col_options = None
+        self.WIDTH = None  # Додано WIDTH та HEIGHT як атрибути класу Options
+        self.HEIGHT = None
 
     def start(self):
         pygame.init()
@@ -25,6 +27,7 @@ class Options:
         screen_size = self.screen_settings.get_screen_size()
         self.HEIGHT, self.WIDTH = self.screen_settings.SCREEN_SIZES[screen_size]
         screen = pygame.display.set_mode([self.WIDTH, self.HEIGHT])
+        self.WIDTH, self.HEIGHT = screen.get_size()  # Отримання розміру екрану
 
         running = True
         while running:
@@ -49,6 +52,7 @@ class Options:
                             self.HEIGHT, self.WIDTH = self.screen_settings.SCREEN_SIZES[screen_size]
                             self.ind = self.screen_settings.get_ind()
                             screen = pygame.display.set_mode([self.WIDTH, self.HEIGHT])
+                            self.WIDTH, self.HEIGHT = screen.get_size()  # Оновлення розміру екрану
                     for color_rect, color in zip(self.col_option_rects, self.col_options):
                         if color_rect.collidepoint(mouse_pos):
                             self.screen_settings.set_background_color(color)
@@ -70,8 +74,9 @@ class Options:
         pygame.quit()
 
     def draw_options_screen(self, screen):
+        self.WIDTH, self.HEIGHT = screen.get_size()
         back_text = get_font(20, self.ind).render("Back to Menu", True, (255, 255, 255))
-        self.back_rect = back_text.get_rect(topright=((self.WIDTH - 20), 20))
+        self.back_rect = back_text.get_rect(topright=((self.WIDTH - 20), 20))  # Використання WIDTH та HEIGHT
         screen.blit(back_text, self.back_rect)
 
         if self.back_rect.collidepoint(pygame.mouse.get_pos()):
