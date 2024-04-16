@@ -15,6 +15,8 @@ class Menu:
         self.options_rect = None
         self.quit_rect = None
         self.ind = screen_settings.get_ind()
+        self.WIDTH = None
+        self.HEIGHT = None
 
     def start(self):
         pygame.display.set_caption("PacMan")
@@ -51,7 +53,7 @@ class Menu:
         pygame.quit()
 
     def draw_menu(self, screen):
-
+        self.WIDTH, self.HEIGHT = screen.get_size()  # Отримання розміру екрану
         menu_text = get_font(65, self.ind).render("MAIN MENU", True, "#f4cd33")
         menu_rect = menu_text.get_rect(center=(self.WIDTH // 2, (self.HEIGHT // 2) - (300 * self.ind)))
         screen.blit(menu_text, menu_rect)
