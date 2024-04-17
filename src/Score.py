@@ -6,6 +6,10 @@ class PlayerScore:
         self.__score = 0
         self.__screen = screen
 
+    @property
+    def get_screen(self):
+        return self.__screen
+
     def get_score(self):
         return self.__score
 
