@@ -12,6 +12,14 @@ class Health(Observable):
         self.__screen = screen
         self.__health = self.BASE_HEALTH
 
+    @property
+    def get_screen(self):
+        return self.__screen
+
+    @property
+    def get_health(self):
+        return self.__health
+
     def decrease_health(self):
         self.__health -= 1
         self.notify_observers("decrease_health")
