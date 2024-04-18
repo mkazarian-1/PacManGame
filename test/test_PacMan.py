@@ -39,8 +39,9 @@ def test_is_cell_action_with_energiser(pacman):
 
     assert pacman.is_cell_action(cell) is True
 
+
 def test_is_cell_action_with_non_actionable_cell(pacman):
-    cell = LevelEnvironment.Wall(None, None, None, None, None, None,None)
+    cell = LevelEnvironment.Wall(None, None, None, None, None, None, None)
 
     assert pacman.is_cell_action(cell) is False
 
