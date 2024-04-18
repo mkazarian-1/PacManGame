@@ -1,5 +1,5 @@
-import pygame
-from win32api import GetSystemMetrics
+import tkinter
+
 
 class ScreenSettings:
     def __init__(self):
@@ -7,10 +7,11 @@ class ScreenSettings:
         self.current_background_color = "Black"
         self.background_image = None
         self.image_inserted = False
+
         self.SCREEN_SIZES = {
-            "Small": (GetSystemMetrics(1) // 2, GetSystemMetrics(1) * 0.95 // 2),
-            "Medium": (GetSystemMetrics(1) // 1.5, GetSystemMetrics(1) * 0.95 // 1.5),
-            "Large": (GetSystemMetrics(1) - 70, (GetSystemMetrics(1) - 70) * 0.95)
+            "Small": (tkinter.Tk().winfo_screenheight() // 2, tkinter.Tk().winfo_screenheight() * 0.95 // 2),
+            "Medium": (tkinter.Tk().winfo_screenheight() // 1.5, tkinter.Tk().winfo_screenheight() * 0.95 // 1.5),
+            "Large": (tkinter.Tk().winfo_screenheight() - 70, (tkinter.Tk().winfo_screenheight() - 70) * 0.95)
         }
         self.BACKGROUND_COLORS = {
             "Black": (0, 0, 0),
@@ -18,7 +19,6 @@ class ScreenSettings:
             "Brown": (77, 33, 34),
             "Pink": (200, 7, 111)
         }
-
 
     def set_screen_size(self, size):
         if size in self.SCREEN_SIZES:

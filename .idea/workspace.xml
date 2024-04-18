@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bb0cae0f-83d0-4820-83da-6b441779e503" name="Changes" comment="Direction configuration">
+    <list default="true" id="bb0cae0f-83d0-4820-83da-6b441779e503" name="Changes" comment="Git configuration update">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/test_PacMan.py" beforeDir="false" afterPath="$PROJECT_DIR$/test/test_PacMan.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ScreenSettings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ScreenSettings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -253,7 +254,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713479395852</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Git configuration update">
+      <option name="closed" value="true" />
+      <created>1713480795277</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1713480795277</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -285,7 +294,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Adding requirements.txt" />
     <MESSAGE value="Direction configuration" />
-    <option name="LAST_COMMIT_MESSAGE" value="Direction configuration" />
+    <MESSAGE value="Git configuration update" />
+    <option name="LAST_COMMIT_MESSAGE" value="Git configuration update" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -310,7 +320,7 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/PacManGame$main.coverage" NAME="main Coverage Results" MODIFIED="1713479402649" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/PacManGame$.coverage" NAME=" Coverage Results" MODIFIED="1713479360269" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
+    <SUITE FILE_PATH="coverage/PacManGame$main.coverage" NAME="main Coverage Results" MODIFIED="1713481492965" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PacManGame$.coverage" NAME=" Coverage Results" MODIFIED="1713481484568" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/test" />
   </component>
 </project>
