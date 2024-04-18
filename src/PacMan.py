@@ -3,9 +3,10 @@ import pygame
 from src.Observer import Observable
 from src.Position import Position
 from src.level import LevelBuilder, LevelEnvironment
+from src.level.LevelBuilder import LevelController
 
 
-class PacMan (Observable):
+class PacMan(Observable):
     PACMAN_SPEED = 2.5
 
     def __init__(self, screen: pygame.surface.Surface, level_controller: LevelBuilder.LevelController):
@@ -35,21 +36,13 @@ class PacMan (Observable):
         self.rotation_allow = True
 
         # 0-Right 1-Left 2-Up 3-Down
-        self.turn_allow = self.__turn_allow_update(self.pacman_cell_x,self.pacman_cell_y)
+        self.turn_allow = self.turn_allow_update(self.pacman_cell_x, self.pacman_cell_y)
 
-        self.pacman_images = self.__set_pacman_image(self.pacman_width, self.pacman_height)
+        self.pacman_images = self.set_pacman_image(self.pacman_width, self.pacman_height)
 
         self.pacman_rect = self.get_pacman_rect()
 
         self.pacman_dead = False
-
-    def update_position(self):
-        self.__pacman_rotation()
-        self.__out_of_bound_controller()
-        self.__pacman_move()
-        self.__pacman_action()
-        self.__draw_player()
-        self.pacman_rect = self.get_pacman_rect()
 
     def set_turn_right(self):
         self.turn = Position.RIGHT
@@ -69,7 +62,7 @@ class PacMan (Observable):
     def get_cell_coordinates(self):
         return [self.pacman_cell_x, self.pacman_cell_y]
 
-    def __draw_player(self):
+    def draw_player(self):
         pacman_x = self.pacman_center_x - self.pacman_width / 2
         pacman_y = self.pacman_center_y - self.pacman_height / 2
 
@@ -93,16 +86,34 @@ class PacMan (Observable):
         else:
             pass
 
-    def __pacman_move(self):
+    def update_position(self):
+        if self.rotation_allow and not self.turn_allow[self.direction.value - 1]:
+            self.pacman_center_x = self.get_coordinate_by_cell(self.cell_width, self.pacman_cell_x, 0.5)
+            self.pacman_center_y = self.get_coordinate_by_cell(self.cell_height, self.pacman_cell_y, 0.5)
+
+        self.direction = self.pacman_rotation(self.direction, self.turn_allow)
+
+        if self.is_out_of_bounds(self.direction, self.pacman_cell_x, self.pacman_cell_y):
+            self.pacman_cell_x, self.pacman_cell_y = self.out_of_bound_controller(self.direction,
+                                                                                  self.pacman_cell_x,
+                                                                                  self.pacman_cell_y)
+            self.pacman_center_x = self.get_coordinate_by_cell(self.cell_width, self.pacman_cell_x, 0.5)
+            self.pacman_center_y = self.get_coordinate_by_cell(self.cell_height, self.pacman_cell_y, 0.5)
+
+        self.pacman_move()
+
+        self.pacman_action(self.pacman_cell_x, self.pacman_cell_y)
+        self.draw_player()
+        self.pacman_rect = self.get_pacman_rect()
+
+    def pacman_move(self):
         if self.direction == Position.RIGHT and self.turn_allow[0]:  # RIGHT
             if (self.pacman_center_x + self.PACMAN_SPEED
-                    >= self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x + 1, 0.5)):
+                    >= self.get_coordinate_by_cell(self.cell_width, self.pacman_cell_x + 1, 0.5)):
 
                 self.pacman_cell_x = self.pacman_cell_x + 1
-                self.turn_allow = self.__turn_allow_update(self.pacman_cell_x, self.pacman_cell_y)
+                self.turn_allow = self.turn_allow_update(self.pacman_cell_x, self.pacman_cell_y)
 
-                if not self.turn_allow[0]:
-                    self.pacman_center_x = self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x, 0.5)
                 self.rotation_allow = True
 
             else:
@@ -111,13 +122,10 @@ class PacMan (Observable):
 
         elif self.direction == Position.LEFT and self.turn_allow[1]:  # LEFT
             if (self.pacman_center_x - self.PACMAN_SPEED
-                    <= self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x - 1, 0.5)):
+                    <= self.get_coordinate_by_cell(self.cell_width, self.pacman_cell_x - 1, 0.5)):
 
                 self.pacman_cell_x = self.pacman_cell_x - 1
-                self.turn_allow = self.__turn_allow_update(self.pacman_cell_x, self.pacman_cell_y)
-
-                if not self.turn_allow[1]:
-                    self.pacman_center_x = self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x, 0.5)
+                self.turn_allow = self.turn_allow_update(self.pacman_cell_x, self.pacman_cell_y)
 
                 self.rotation_allow = True
 
@@ -127,14 +135,10 @@ class PacMan (Observable):
 
         elif self.direction == Position.UP and self.turn_allow[2]:  # UP
             if (self.pacman_center_y - self.PACMAN_SPEED
-                    <= self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y - 1, 0.5)):
+                    <= self.get_coordinate_by_cell(self.cell_height, self.pacman_cell_y - 1, 0.5)):
 
                 self.pacman_cell_y = self.pacman_cell_y - 1
-                self.turn_allow = self.__turn_allow_update(self.pacman_cell_x, self.pacman_cell_y)
-
-                if not self.turn_allow[2]:
-                    self.pacman_center_y = self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y, 0.5)
-
+                self.turn_allow = self.turn_allow_update(self.pacman_cell_x, self.pacman_cell_y)
                 self.rotation_allow = True
 
             else:
@@ -143,13 +147,10 @@ class PacMan (Observable):
 
         elif self.direction == Position.DOWN and self.turn_allow[3]:  # DOWN
             if (self.pacman_center_y + self.PACMAN_SPEED
-                    >= self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y + 1, 0.5)):
+                    >= self.get_coordinate_by_cell(self.cell_height, self.pacman_cell_y + 1, 0.5)):
 
                 self.pacman_cell_y = self.pacman_cell_y + 1
-                self.turn_allow = self.__turn_allow_update(self.pacman_cell_x, self.pacman_cell_y)
-
-                if not self.turn_allow[3]:
-                    self.pacman_center_y = self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y, 0.5)
+                self.turn_allow = self.turn_allow_update(self.pacman_cell_x, self.pacman_cell_y)
 
                 self.rotation_allow = True
 
@@ -157,89 +158,94 @@ class PacMan (Observable):
                 self.pacman_center_y = self.pacman_center_y + self.PACMAN_SPEED
                 self.rotation_allow = False
 
-    def __pacman_rotation(self):
+    def pacman_rotation(self, direction, turn_allow):
+        if self.turn == Position.RIGHT and turn_allow[0]:
+            if direction == Position.LEFT:
+                direction = Position.RIGHT
+                self.turn = Position.NOT_DEFINED
 
-        if self.turn == Position.RIGHT and self.turn_allow[0]:
-            if self.direction == Position.LEFT:
-                self.direction = Position.RIGHT
+            elif self.rotation_allow:
+                direction = Position.RIGHT
+                self.turn = Position.NOT_DEFINED
+
+        elif self.turn == Position.LEFT and turn_allow[1]:
+            if direction == Position.RIGHT:
+                direction = Position.LEFT
                 self.turn = Position.NOT_DEFINED
             elif self.rotation_allow:
-                self.direction = Position.RIGHT
+                direction = Position.LEFT
                 self.turn = Position.NOT_DEFINED
-                self.pacman_center_x = self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x, 0.5)
 
-        elif self.turn == Position.LEFT and self.turn_allow[1]:
-            if self.direction == Position.RIGHT:
-                self.direction = Position.LEFT
+        elif self.turn == Position.UP and turn_allow[2]:
+            if direction == Position.DOWN:
+                direction = Position.UP
                 self.turn = Position.NOT_DEFINED
             elif self.rotation_allow:
-                self.direction = Position.LEFT
+                direction = Position.UP
                 self.turn = Position.NOT_DEFINED
-                self.pacman_center_x = self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x, 0.5)
 
-        elif self.turn == Position.UP and self.turn_allow[2]:
-            if self.direction == Position.DOWN:
-                self.direction = Position.UP
+        elif self.turn == Position.DOWN and turn_allow[3]:
+            if direction == Position.UP:
+                direction = Position.DOWN
                 self.turn = Position.NOT_DEFINED
             elif self.rotation_allow:
-                self.direction = Position.UP
+                direction = Position.DOWN
                 self.turn = Position.NOT_DEFINED
-                self.pacman_center_y = self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y, 0.5)
 
-        elif self.turn == Position.DOWN and self.turn_allow[3]:
-            if self.direction == Position.UP:
-                self.direction = Position.DOWN
-                self.turn = Position.NOT_DEFINED
-            elif self.rotation_allow:
-                self.direction = Position.DOWN
-                self.turn = Position.NOT_DEFINED
-                self.pacman_center_y = self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y, 0.5)
+        return direction
 
-    def __pacman_action(self):
-        level_element = self.level_controller.get_cell(self.pacman_cell_x, self.pacman_cell_y)
+    def pacman_action(self, pacman_cell_x, pacman_cell_y):
+        level_element = self.level_controller.get_cell(pacman_cell_x, pacman_cell_y)
 
-        if self.__is_cell_action(level_element):
+        if self.is_cell_action(level_element):
             level_element.action()
-            self.level_controller.delete_cell(self.pacman_cell_x, self.pacman_cell_y)
+            self.level_controller.delete_cell(pacman_cell_x, pacman_cell_y)
             if type(level_element) is LevelEnvironment.Energiser:
                 self.notify_observers("power_pellet_eaten")
 
-    def __out_of_bound_controller(self):
-        if self.direction == Position.RIGHT and self.pacman_cell_x + 1 == (self.cell_len_x - 1):
-            self.pacman_cell_x = 0
-            self.pacman_center_x = 0
+    def out_of_bound_controller(self, direction, pacman_cell_x, pacman_cell_y):
+        if direction == Position.RIGHT and pacman_cell_x + 1 == (self.cell_len_x - 1):
+            pacman_cell_x = 0
 
-        elif self.direction == Position.LEFT and self.pacman_cell_x == 0:
-            self.pacman_cell_x = self.cell_len_x - 2
-            self.pacman_center_x = self.__get_coordinate_by_cell(self.cell_width, self.pacman_cell_x, 1)
+        elif direction == Position.LEFT and pacman_cell_x == 0:
+            pacman_cell_x = self.cell_len_x - 2
 
-        elif self.direction == Position.UP and self.pacman_cell_y + 1 == (self.cell_len_y - 1):
-            self.pacman_cell_y = 0
-            self.pacman_center_y = 0
+        elif direction == Position.UP and pacman_cell_y + 1 == (self.cell_len_y - 1):
+            pacman_cell_y = 0
 
-        elif self.direction == Position.DOWN and self.pacman_cell_y == 0:
-            self.pacman_cell_y = self.cell_len_y - 2
-            self.pacman_center_y = self.__get_coordinate_by_cell(self.cell_height, self.pacman_cell_y, 1)
+        elif direction == Position.DOWN and pacman_cell_y == 0:
+            pacman_cell_y = self.cell_len_y - 2
 
-    def __turn_allow_update(self, cell_x, cell_y):
+        return pacman_cell_x, pacman_cell_y
+
+    def is_out_of_bounds(self, direction, pacman_cell_x, pacman_cell_y):
+        return ((direction == Position.RIGHT and pacman_cell_x + 1 == (self.cell_len_x - 1))
+                or (direction == Position.LEFT and pacman_cell_x == 0)
+                or (direction == Position.UP and pacman_cell_y + 1 == (self.cell_len_y - 1))
+                or (direction == Position.DOWN and pacman_cell_y == 0))
+
+    # --- level_controller
+    def turn_allow_update(self, cell_x, cell_y):
         cell_right = self.level_controller.get_cell(cell_x + 1, cell_y)
         cell_left = self.level_controller.get_cell(cell_x - 1, cell_y)
         cell_up = self.level_controller.get_cell(cell_x, cell_y - 1)
         cell_down = self.level_controller.get_cell(cell_x, cell_y + 1)
 
-        return [not self.__is_cell_wall(cell_right),
-                not self.__is_cell_wall(cell_left),
-                not self.__is_cell_wall(cell_up),
-                not self.__is_cell_wall(cell_down)]
+        return [not self.is_cell_wall(cell_right),
+                not self.is_cell_wall(cell_left),
+                not self.is_cell_wall(cell_up),
+                not self.is_cell_wall(cell_down)]
 
-    def __is_cell_wall(self, cell):
+    # --- know
+    def is_cell_wall(self, cell):
         return issubclass(type(cell), LevelEnvironment.IWallAble)
 
-    def __is_cell_action(self, cell):
+    # --- know
+    def is_cell_action(self, cell):
         return issubclass(type(cell), LevelEnvironment.IActionable)
 
     @staticmethod
-    def __set_pacman_image(width, height):
+    def set_pacman_image(width, height):
         images = []
         for i in range(1, 5):
             image = pygame.image.load(f'characters/pacman_images/{i}.png')
@@ -249,12 +255,11 @@ class PacMan (Observable):
         return images
 
     @staticmethod
-    def __get_coordinate_by_cell(cell_size, cell_coordinate, offset):
+    def get_coordinate_by_cell(cell_size, cell_coordinate, offset):
         return cell_size * (cell_coordinate + offset)
 
     def get_pacman_rect(self):
         pacman_rect = pygame.rect.Rect(
             (self.pacman_center_x - self.pacman_width // 5, self.pacman_center_y - self.pacman_height // 5),
-            (self.pacman_width//2, self.pacman_height//2))
+            (self.pacman_width // 2, self.pacman_height // 2))
         return pacman_rect
-
