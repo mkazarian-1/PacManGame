@@ -4,7 +4,7 @@ import pytest
 from src import Score
 from src.Health import Health
 from src.PacMan import PacMan
-from src.level import LevelMap, LevelBuilder, LevelEnvironment
+from src.level import LevelMap, LevelBuilder, LevelEnvironment, EndGameController
 from src.level.EndGameController import EndGameController
 
 
@@ -56,3 +56,14 @@ def test_is_cell_action_with_non_actionable_cell(pacman):
 #         pass
 #     wall_cell = Wall()
 #     assert pacman_instance.is_cell_action(wall_cell) is False
+
+
+@pytest.mark.parametrize("x, y, expected", [
+    (28, 0, [False, False, False, True]),
+    (10, 5, [False, False, False, True])
+])
+def test_turn_allow_update(pacman, x, y, expected):
+    pacman.turn_allow_update(x, y)
+    assert pacman.turn_allow_update(27, 1) == expected
+
+
