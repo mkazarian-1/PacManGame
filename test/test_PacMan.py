@@ -46,7 +46,6 @@ def test_is_cell_action_with_non_actionable_cell(pacman):
 
     assert pacman.is_cell_action(cell) is False
 
-
 def test_pacman_rotation_turn_right(pacman):
     pacman.turn = Position.RIGHT
     direction = pacman.pacman_rotation(Position.LEFT, [True, False, False, False])
@@ -151,15 +150,22 @@ def test_is_out_of_bounds_no_boundary(pacman):
     pacman_cell_x = 5
     pacman_cell_y = 5
     assert pacman.is_out_of_bounds(direction, pacman_cell_x, pacman_cell_y) is False
+    
+def test_is_cell_wall(pacman):
+    cell = LevelEnvironment.Wall(None, None, None, None, None, None, None)
 
-# def test_is_cell_action_with_energiser(pacman_instance):
-#     # Перевірка, чи правильно визначається дія для клітинки з енергійними стимуляторами
-#     energiser_cell = Energiser()
-#     assert pacman_instance.is_cell_action(energiser_cell) is True
-#
-# def test_is_cell_action_with_non_actionable_cell(pacman_instance):
-#     # Перевірка, чи правильно визначається відсутність дії для клітинки без дійових об'єктів
-#     class Wall:
-#         pass
-#     wall_cell = Wall()
-#     assert pacman_instance.is_cell_action(wall_cell) is False
+    assert pacman.is_cell_wall(cell) is True
+
+
+def test_get_coordinate_by_cell(pacman):
+    cell_size = 10
+    cell_coordinate = 5
+    offset = 2
+
+    expected_value = cell_size * (cell_coordinate + offset)
+
+    result = PacMan.get_coordinate_by_cell(cell_size, cell_coordinate, offset)
+
+    assert result == expected_value
+
+
