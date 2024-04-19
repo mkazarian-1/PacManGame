@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="bb0cae0f-83d0-4820-83da-6b441779e503" name="Changes" comment="Git configuration update">
+    <list default="true" id="bb0cae0f-83d0-4820-83da-6b441779e503" name="Changes" comment="Git configuration update (Delete menu tests)">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/ScreenSettings.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/ScreenSettings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,29 +40,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python tests.Python tests for test_PacMan.test_something.executor": "Run",
-    "Python tests.Python tests in test (1).executor": "Run",
-    "Python tests.Python tests in test.executor": "Run",
-    "Python tests.Python tests in test_main.py.executor": "Run",
-    "Python tests.Python tests in test_menu.py.executor": "Run",
-    "Python tests.Python tests in tests.executor": "Run",
-    "Python.main.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "master",
-    "last_opened_file_path": "E:/Python_projects/PacManGame/test",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python tests.Python tests for test_PacMan.test_something.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test (1).executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test_main.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test_menu.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in tests.executor&quot;: &quot;Run&quot;,
+    &quot;Python.main.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;last_opened_file_path&quot;: &quot;E:/Python_projects/PacManGame/test&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;editor.preferences.fonts.default&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="E:\Python_projects\PacManGame\test" />
@@ -237,6 +235,7 @@
       <workItem from="1713296842502" duration="1327000" />
       <workItem from="1713446293849" duration="10521000" />
       <workItem from="1713462684451" duration="1191000" />
+      <workItem from="1713506730305" duration="889000" />
     </task>
     <task id="LOCAL-00001" summary="Adding requirements.txt">
       <option name="closed" value="true" />
@@ -262,7 +261,23 @@
       <option name="project" value="LOCAL" />
       <updated>1713480795277</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Git configuration update (Delete pywin32)">
+      <option name="closed" value="true" />
+      <created>1713481563636</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1713481563636</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Git configuration update (Delete menu tests)">
+      <option name="closed" value="true" />
+      <created>1713481764334</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1713481764334</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -295,7 +310,9 @@
     <MESSAGE value="Adding requirements.txt" />
     <MESSAGE value="Direction configuration" />
     <MESSAGE value="Git configuration update" />
-    <option name="LAST_COMMIT_MESSAGE" value="Git configuration update" />
+    <MESSAGE value="Git configuration update (Delete pywin32)" />
+    <MESSAGE value="Git configuration update (Delete menu tests)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Git configuration update (Delete menu tests)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
