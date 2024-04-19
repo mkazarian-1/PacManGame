@@ -46,6 +46,27 @@ def test_is_cell_action_with_non_actionable_cell(pacman):
 
     assert pacman.is_cell_action(cell) is False
 
+# def test_is_cell_action_with_energiser(pacman_instance):
+#     # Перевірка, чи правильно визначається дія для клітинки з енергійними стимуляторами
+#     energiser_cell = Energiser()
+#     assert pacman_instance.is_cell_action(energiser_cell) is True
+#
+# def test_is_cell_action_with_non_actionable_cell(pacman_instance):
+#     # Перевірка, чи правильно визначається відсутність дії для клітинки без дійових об'єктів
+#     class Wall:
+#         pass
+#     wall_cell = Wall()
+#     assert pacman_instance.is_cell_action(wall_cell) is False
+
+
+@pytest.mark.parametrize("x, y, expected", [
+    (28, 0, [False, False, False, True]),
+    (10, 5, [False, False, False, True])
+])
+def test_turn_allow_update(pacman, x, y, expected):
+    pacman.turn_allow_update(x, y)
+    assert pacman.turn_allow_update(27, 1) == expected
+
 def test_pacman_rotation_turn_right(pacman):
     pacman.turn = Position.RIGHT
     direction = pacman.pacman_rotation(Position.LEFT, [True, False, False, False])
