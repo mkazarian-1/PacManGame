@@ -45,6 +45,27 @@ def test_is_cell_action_with_non_actionable_cell(pacman):
 
     assert pacman.is_cell_action(cell) is False
 
+
+def test_is_cell_wall(pacman):
+    cell = LevelEnvironment.Wall(None, None, None, None, None, None, None)
+
+    assert pacman.is_cell_wall(cell) is True
+
+
+def test_get_coordinate_by_cell(pacman):
+    cell_size = 10
+    cell_coordinate = 5
+    offset = 2
+
+    # Розраховуємо очікуване значення
+    expected_value = cell_size * (cell_coordinate + offset)
+
+    # Викликаємо метод `get_coordinate_by_cell` з заданими аргументами
+    result = PacMan.get_coordinate_by_cell(cell_size, cell_coordinate, offset)
+
+    # Перевіряємо, чи результат відповідає очікуваному значенню
+    assert result == expected_value
+
 # def test_is_cell_action_with_energiser(pacman_instance):
 #     # Перевірка, чи правильно визначається дія для клітинки з енергійними стимуляторами
 #     energiser_cell = Energiser()
